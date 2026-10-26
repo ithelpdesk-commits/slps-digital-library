@@ -79,7 +79,9 @@ body.locked .gate{display:flex}
 .gate .crest{margin:0 auto}
 .gate h2{font-family:var(--display);font-weight:700;font-size:28px;margin:0;line-height:1.15}
 .gate p{margin:0;color:var(--muted);font-size:15px}
+.actions{display:flex;flex-direction:column;gap:8px}
 .gbtn{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px 14px;font-size:15px}
+.gbtn.ghost svg{display:none}
 .gbtn svg{width:18px;height:18px;flex:none;background:#fff;border-radius:50%;padding:2px}
 .gate .err{color:var(--mark);font-weight:600;font-size:14px;min-height:1.4em}
 .gate .note{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
@@ -112,20 +114,22 @@ body.gate-busy .gate .btn{opacity:.6;pointer-events:none}
 <section class="gate" id="gate"><div class="card">
   <div class="crest"><img src="" alt="" id="gatecrest"></div>
   <h2>Sign in to the Digital Library</h2>
-  <p>Use your school Google account (<b>@slps.one</b>). Students see resources rated for their class; staff see everything.</p>
+  <p>Use your school Google account (<b>@slps.one</b>).</p>
+  <div class="actions" id="actions">
   <button class="btn gbtn" type="button" id="gsignin">
     <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.7 2.3 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.5-.8-3-.8-4.7s.3-3.2.8-4.7l-7.8-6.1C.9 16.5 0 20.1 0 24s.9 7.5 2.6 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.5-2 15.4-5.6l-7.5-5.8c-2.1 1.4-4.8 2.3-7.9 2.3-6.3 0-11.7-4.1-13.6-9.8l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
-    Sign in with Google
+    Sign in
   </button>
+  <button class="btn gbtn ghost" type="button" id="gcreate">Create account</button>
+  </div>
   <div class="err" id="gerr" role="alert"></div>
 
   <!-- Step 2: first-time users create their library account (goes to the school's Google Form/Sheet) -->
   <form class="reg" id="register" hidden>
     <h3>Create your library account</h3>
-    <p>Signed in as <b id="regemail"></b>. Tell us who you are — the library will approve your account, usually within a day.</p>
+    <p>Signed in as <b id="regemail"></b>. The library will approve your account, usually within a day.</p>
     <label>Full name<input id="regname" type="text" required autocomplete="name"></label>
-    <label>Class<select id="regclass" required><option value="">— choose —</option></select></label>
-    <label><span>Section / roll no. <span class="opt">(optional)</span></span><input id="regsec" type="text" placeholder="e.g. B · 14"></label>
+    <label><span>Class / section <span class="opt">(optional)</span></span><input id="regsec" type="text" placeholder="e.g. 7 B"></label>
     <button class="btn" type="submit" id="regsubmit">Create account</button>
     <button class="btn ghost" type="button" id="regcancel">Cancel</button>
   </form>
@@ -192,16 +196,17 @@ const SESSION_HOURS = 12;
 //    New users fill "Create your library account"; the answer goes into a Google Form, the librarian
 //    opens the linked Google Sheet and writes "yes" in an Approved column; the page reads that sheet.
 //    Setup (one time):
-//      a. Create a Google Form with 4 short-answer questions, in this order: Email, Name, Class, Section.
+//      a. Create a Google Form with 3 short-answer questions, in this order: Email, Name, Class/Section (what the student typed).
 //      b. Form → ⋮ → "Get pre-filled link" → fill dummy answers → copy link → the entry.NNN numbers go below.
-//      c. Form → Responses → "Link to Sheets". In that sheet add a column headed "Approved".
+//      c. Form → Responses → "Link to Sheets". In that sheet add two columns headed "Approved" and "Class".
+//         When approving, the librarian types yes in Approved and the class (1–12 or Staff) in Class.
 //      d. Sheet → File → Share → Publish to web → choose the responses tab + "Comma-separated values (.csv)" → copy link below.
 //    Leave ROSTER_CSV_URL empty to skip registration (class is then read from the login ID, see 3).
 const REGISTER_FORM_URL = "";   // e.g. https://docs.google.com/forms/d/e/1FAIpQL.../formResponse
-const REGISTER_FIELDS = { email: "entry.0", name: "entry.0", cls: "entry.0", section: "entry.0" };
+const REGISTER_FIELDS = { email: "entry.0", name: "entry.0", section: "entry.0" };
 const ROSTER_CSV_URL = "";      // e.g. https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?gid=0&single=true&output=csv
 //    In the sheet, Approved = yes / y / ok / approved → allowed in; blank → pending; no / rejected → refused.
-//    Class column: a number 1–12, "Class 7", or "Staff".
+//    Class column (filled by the librarian): a number 1–12, "Class 7", or "Staff". Approved with no class = sees only unrated items.
 // 2) Only Google accounts on this domain may enter.
 const SCHOOL_DOMAIN = "slps.one";
 // 3) How a student's class is read from the login ID (the part before @).
@@ -280,7 +285,7 @@ const gerr=document.getElementById('gerr');
 function setUser(u){
  user=u; document.body.classList.toggle('locked',!u);
  if(u){document.getElementById('uname').textContent=u.name;
-  document.getElementById('uclass').textContent=u.cls==='staff'?'Staff · '+u.email:'Class '+u.cls+' · '+u.email;
+  document.getElementById('uclass').textContent=(u.cls==='staff'?'Staff':u.cls?'Class '+u.cls:'Student')+' · '+u.email;
   gerr.textContent=''; render();}
 }
 const configured=!!GOOGLE_CLIENT_ID;
@@ -290,13 +295,9 @@ function loadSession(){try{const u=JSON.parse(localStorage.getItem(SKEY)||'null'
 function clearSession(){try{localStorage.removeItem(SKEY)}catch(e){}}
 // ── ACCOUNT REGISTRATION (roster in a Google Sheet) ──
 const regEl=document.getElementById('register'),pendEl=document.getElementById('pending');
-const gsiHost=document.createElement('div'); gsiHost.id='gsi'; gsiHost.style.cssText='display:flex;justify-content:center';
-const regClass=document.getElementById('regclass');
-for(let n=1;n<=12;n++){const o=document.createElement('option');o.value=n;o.textContent='Class '+n;regClass.appendChild(o)}
-{const o=document.createElement('option');o.value='staff';o.textContent='Staff / teacher';regClass.appendChild(o)}
 function showStep(step){ // 'signin' | 'register' | 'pending'
  regEl.hidden=step!=='register'; pendEl.hidden=step!=='pending';
- gsiHost.style.display=step==='signin'?'flex':'none'; if(!configured) document.getElementById('gsignin').hidden=step!=='signin';
+ document.getElementById('actions').hidden=step!=='signin';
  const p=document.querySelector('.gate>.card>p'); if(p) p.hidden=step!=='signin';
 }
 function parseCSV(text){const rows=[];let row=[],f='',q=false;
@@ -310,7 +311,8 @@ async function fetchRoster(){
  if(!r.ok) throw new Error('roster '+r.status);
  const rows=parseCSV(await r.text()); if(!rows.length) return new Map();
  const h=rows[0].map(x=>x.toLowerCase()); const col=k=>h.findIndex(x=>x.includes(k));
- const ie=col('email'),ic=col('class'),ia=col('approv'),in_=col('name');
+ const exact=k=>h.findIndex(x=>x.trim()===k); const ie=col('email'),ia=col('approv'),in_=col('name');
+ const ic=exact('class')>=0?exact('class'):-1; // the librarian's own "Class" column, not the student's "Class/Section" answer
  const map=new Map(); // email → {status, cls, name}   (last row for an email wins)
  rows.slice(1).forEach(r=>{const e=(r[ie]||'').trim().toLowerCase(); if(!e) return;
   const a=(ia>=0?r[ia]:'').trim().toLowerCase();
@@ -324,7 +326,7 @@ async function admit(profile){ // called after a successful Google sign-in (or r
  document.body.classList.add('gate-busy'); gerr.textContent='';
  try{
   const roster=await fetchRoster(); const rec=roster.get(profile.email);
-  if(rec&&rec.status==='approved'&&rec.cls){ const u={name:rec.name||profile.name,email:profile.email,cls:rec.cls}; saveSession(u); setUser(u); return; }
+  if(rec&&rec.status==='approved'){ const u={name:rec.name||profile.name,email:profile.email,cls:rec.cls||0}; saveSession(u); setUser(u); return; }
   pendingProfile=profile; setUser(null);
   if(rec&&rec.status==='rejected'){ showStep('signin'); gerr.textContent='Your account request was not approved. Please contact the library.'; return; }
   if(rec){ document.getElementById('pendingmsg').textContent='Your account request ('+profile.email+') is waiting for the library to approve it. Please check back later.'; showStep('pending'); return; }
@@ -335,10 +337,10 @@ async function admit(profile){ // called after a successful Google sign-in (or r
 }
 regEl.onsubmit=async e=>{e.preventDefault(); if(!pendingProfile) return;
  if(!REGISTER_FORM_URL){ const n=document.getElementById('regname').value.trim(); document.getElementById('pendingmsg').textContent='(Preview) Thank you, '+n+'. In the live site this request would be sent to the school\'s Google Form.'; showStep('pending'); return; }
- const name=document.getElementById('regname').value.trim(), cls=regClass.value, sec=document.getElementById('regsec').value.trim();
- if(!name||!cls){gerr.textContent='Please fill your name and class.';return}
+ const name=document.getElementById('regname').value.trim(), sec=document.getElementById('regsec').value.trim();
+ if(!name){gerr.textContent='Please fill your name.';return}
  const fd=new FormData(); fd.append(REGISTER_FIELDS.email,pendingProfile.email); fd.append(REGISTER_FIELDS.name,name);
- fd.append(REGISTER_FIELDS.cls,cls==='staff'?'Staff':'Class '+cls); fd.append(REGISTER_FIELDS.section,sec);
+ fd.append(REGISTER_FIELDS.section,sec);
  document.body.classList.add('gate-busy'); gerr.textContent='';
  try{ await fetch(REGISTER_FORM_URL,{method:'POST',mode:'no-cors',body:fd}); // Google Forms accepts the post; the response is opaque by design
   document.getElementById('pendingmsg').textContent='Thank you, '+name+'. Your request has been sent to the library and will be approved soon — please check back later.'; showStep('pending'); toast('Account request sent');
@@ -349,29 +351,33 @@ document.getElementById('regcancel').onclick=()=>{pendingProfile=null;showStep('
 document.getElementById('pendingrefresh').onclick=()=>{ if(pendingProfile) admit(pendingProfile); };
 
 if(configured){
- // Google Identity Services: Google's own button signs the user in and hands back an ID token (a signed JWT).
- const gbtn=document.getElementById('gsignin'); gbtn.hidden=true; gbtn.after(gsiHost);
- function onCredential(res){
-  const payload=JSON.parse(atob(res.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
-  const email=(payload.email||'').toLowerCase();
-  if(!payload.email_verified||!email.endsWith('@'+SCHOOL_DOMAIN)){
-   gerr.textContent='Only @'+SCHOOL_DOMAIN+' school accounts can use the library. You signed in as '+email+'.';
-   if(window.google) google.accounts.id.disableAutoSelect(); return;
-  }
-  admit({name:payload.name||email,email});
- }
+ // Google Identity Services (OAuth token flow): either button opens Google's account chooser in a popup;
+ // we then read the signed-in person's email and name from Google's userinfo endpoint.
+ let tokenClient=null;
  function initGsi(){
-  if(!window.google||!google.accounts){ setTimeout(initGsi,150); return; }
-  google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:onCredential,hd:SCHOOL_DOMAIN,ux_mode:'popup',auto_select:false});
-  google.accounts.id.renderButton(gsiHost,{theme:'filled_blue',size:'large',width:360,text:'signin_with',shape:'rectangular'});
+  if(!window.google||!google.accounts||!google.accounts.oauth2){ setTimeout(initGsi,150); return; }
+  tokenClient=google.accounts.oauth2.initTokenClient({client_id:GOOGLE_CLIENT_ID,scope:'openid email profile',hd:SCHOOL_DOMAIN,prompt:'select_account',
+   callback:async t=>{
+    if(!t||!t.access_token){ gerr.textContent='Sign-in failed. Please try again.'; return; }
+    try{
+     const r=await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+t.access_token}});
+     const p=await r.json(); const email=(p.email||'').toLowerCase();
+     if(!p.email_verified||!email.endsWith('@'+SCHOOL_DOMAIN)){ gerr.textContent='Only @'+SCHOOL_DOMAIN+' school accounts can use the library. You signed in as '+email+'.'; return; }
+     admit({name:p.name||email,email});
+    }catch(e){ gerr.textContent='Could not read your Google account. Please try again.'; }
+   },
+   error_callback:e=>{ gerr.textContent=e&&e.type==='popup_closed'?'Sign-in window was closed.':'Sign-in failed. Please try again.'; }
+  });
  }
  initGsi();
- document.getElementById('signout').onclick=()=>{clearSession(); pendingProfile=null; if(window.google) google.accounts.id.disableAutoSelect(); showStep('signin'); setUser(null)};
+ const start=()=>{ gerr.textContent=''; if(!tokenClient){gerr.textContent='Still loading Google sign-in… try again in a second.';return} tokenClient.requestAccessToken(); };
+ document.getElementById('gsignin').onclick=start; document.getElementById('gcreate').onclick=start;
+ document.getElementById('signout').onclick=()=>{clearSession(); pendingProfile=null; showStep('signin'); setUser(null)};
  const saved=loadSession(); if(saved) admit({name:saved.name,email:saved.email});
 }else{
  // Not configured yet — show the preview dropdown so the page can be reviewed.
  document.getElementById('preview').hidden=false;
- document.getElementById('gsignin').onclick=()=>{gerr.textContent='Sign-in is not set up yet. Paste the Google Client ID at the top of the script.'};
+ document.getElementById('gsignin').onclick=document.getElementById('gcreate').onclick=()=>{gerr.textContent='Sign-in is not set up yet. Paste the Google Client ID at the top of the script.'};
  document.getElementById('previewas').onchange=e=>{const v=e.target.value; if(!v) return;
   if(v==='new'){pendingProfile={name:'Aarav Sharma',email:'aarav.sharma@'+SCHOOL_DOMAIN};document.getElementById('regemail').textContent=pendingProfile.email;document.getElementById('regname').value=pendingProfile.name;showStep('register');return}
   if(v==='pending'){document.getElementById('pendingmsg').textContent='Your account request (aarav.sharma@'+SCHOOL_DOMAIN+') is waiting for the library to approve it. Please check back later.';showStep('pending');return}

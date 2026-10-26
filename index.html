@@ -70,19 +70,56 @@ nav a[aria-current]{text-decoration:underline;text-underline-offset:5px;opacity:
 footer .wrap{padding-block:18px 28px;color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;z-index:20}
 @media (prefers-reduced-motion:no-preference){.card{transition:transform .15s}.card:hover{transform:translateY(-2px)}}
-</style>
 
+/* ── Login gate ── covers the library until a slps.one Google account has signed in */
+body.locked main,body.locked .ndli{display:none}
+.gate{display:none;min-height:60vh;align-items:center;justify-content:center;padding:40px 16px}
+body.locked .gate{display:flex}
+.gate .card{max-width:420px;width:100%;padding:28px;gap:14px;text-align:center}
+.gate .crest{margin:0 auto}
+.gate h2{font-family:var(--display);font-weight:700;font-size:28px;margin:0;line-height:1.15}
+.gate p{margin:0;color:var(--muted);font-size:15px}
+.gbtn{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px 14px;font-size:15px}
+.gbtn svg{width:18px;height:18px;flex:none;background:#fff;border-radius:50%;padding:2px}
+.gate .err{color:var(--mark);font-weight:600;font-size:14px;min-height:1.4em}
+.gate .note{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+.gate .preview{border:1px dashed var(--line);border-radius:8px;padding:10px;font-size:13px;color:var(--muted);text-align:left}
+.gate .preview select{font:inherit;margin-top:6px;width:100%;padding:7px 10px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--fg)}
+.user{display:flex;align-items:center;gap:10px;font-size:13px}
+.user b{font-weight:600}.user span{opacity:.8}
+.user .btn.ghost{color:#fff;border-color:rgba(255,255,255,.6);padding:5px 10px}
+body.locked .user{display:none}
+.hidden-note{color:var(--muted);font-size:13px}
+</style>
 </head>
 <body>
 <header><div class="wrap">
   <div class="brand"><div class="crest"><img src="data:image/jpeg;base64,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" alt="Silverline Prestige School logo"></div><h1>Silverline Prestige School<small>Digital Library · Try to attain thy heights</small></h1></div>
   <nav><a href="https://silverlineprestigeschool.com/" target="_blank" rel="noopener">Home</a><a href="#" aria-current="page">Library</a><a href="https://silverlineprestigeschool.com/about.html" target="_blank" rel="noopener">About SLPS</a><a href="https://silverlineprestigeschool.com/" target="_blank" rel="noopener">Admission</a><a href="https://silverlineprestigeschool.com/" target="_blank" rel="noopener">Contact Us</a></nav>
+  <div class="user" id="user"><div><b id="uname"></b><br><span id="uclass"></span></div><button class="btn ghost" type="button" id="signout">Sign out</button></div>
 </div></header>
+
+<!-- Login screen: shown until a @slps.one Google account signs in -->
+<section class="gate" id="gate"><div class="card">
+  <div class="crest"><img src="" alt="" id="gatecrest"></div>
+  <h2>Sign in to the Digital Library</h2>
+  <p>Use your school Google account (<b>@slps.one</b>). Students see resources rated for their class; staff see everything.</p>
+  <button class="btn gbtn" type="button" id="gsignin">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.7 2.3 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.5-.8-3-.8-4.7s.3-3.2.8-4.7l-7.8-6.1C.9 16.5 0 20.1 0 24s.9 7.5 2.6 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.5-2 15.4-5.6l-7.5-5.8c-2.1 1.4-4.8 2.3-7.9 2.3-6.3 0-11.7-4.1-13.6-9.8l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+    Sign in with Google
+  </button>
+  <div class="err" id="gerr" role="alert"></div>
+  <div class="preview" id="preview" hidden>
+    <b>Sign-in is not set up yet</b> (no Firebase keys pasted). Preview the library as:
+    <select id="previewas"><option value="">— choose —</option><option value="staff">Staff</option><option value="12">Class 12 student</option><option value="10">Class 10 student</option><option value="7">Class 7 student</option><option value="4">Class 4 student</option></select>
+  </div>
+  <div class="note">Only accounts issued by Silverline Prestige School can enter. Trouble signing in? Email <a href="mailto:slps@silverlineprestigeschool.com">slps@silverlineprestigeschool.com</a>.</div>
+</div></section>
 
 <main class="wrap">
   <section class="intro">
     <h2>Find notes, textbooks and past papers for every class</h2>
-    <p>Free for SLPS students, parents and staff. Search by title, author or subject, or filter by class below. Sample catalogue shown for demonstration.</p>
+    <p>Free for SLPS students and staff. Search by title, author or subject, or filter by class below. Sample catalogue shown for demonstration.</p>
   </section>
 
   <div class="search" role="search">
@@ -110,15 +147,45 @@ footer .wrap{padding-block:18px 28px;color:var(--muted);font-size:13px;display:f
   <span>slps@silverlineprestigeschool.com · +91 89202 79300</span>
 </div></footer>
 
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.14.1/firebase-app-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.14.1/firebase-auth-compat.js"></script>
 <script>
+// ══════════════════════════════════════════════════════════════════════
+// LOGIN SETTINGS — the only part the school needs to edit for sign-in
+// ══════════════════════════════════════════════════════════════════════
+// 1) Paste the keys from Firebase console → Project settings → Your apps → Web app.
+//    Leave empty while testing: the page then offers a "preview as" dropdown instead of real sign-in.
+const FIREBASE_CONFIG = {
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  appId: ""
+};
+// 2) Only Google accounts on this domain may enter.
+const SCHOOL_DOMAIN = "slps.one";
+// 3) How a student's class is read from the login ID (the part before @).
+//    Default rule: the first number 1–12 in the ID is the class, e.g. aarav.7@slps.one,
+//    c10.priya@slps.one, 12a.rahul@slps.one  → class 7, 10, 12. IDs with no class number are staff.
+//    Change this one function if your IDs follow a different pattern.
+function classFromEmail(email){
+  const id = email.split('@')[0].toLowerCase();
+  if (STAFF_IDS.includes(id)) return 'staff';
+  const m = id.match(/(?:^|[^0-9])(1[0-2]|[1-9])(?![0-9])/);
+  return m ? +m[1] : 'staff';
+}
+// 4) Staff whose IDs happen to contain a number (so the rule above would misread them).
+const STAFF_IDS = ["principal", "library", "office"];
+// 5) Age rating: give an item  mc:9  to hide it from students below Class 9. Items without mc are open to all classes.
+// ══════════════════════════════════════════════════════════════════════
+
 // ── CATALOGUE ──  Add one line per resource. Put the file link in u:"..." (Google Drive share link, or a PDF uploaded to the site, e.g. "library/maths10.pdf"). Leave u:"" until the file is ready.
 const ITEMS = [
- {t:"Psychology: A Study of Mental Life",a:"Robert S. Woodworth",c:"Class 12",s:"Psychology",ty:"Book",l:"English",y:1921,p:"PDF · 26 MB · 600 pages",u:"https://drive.google.com/file/d/1kyFypkhrussSYopFhKQwYLmQuMae68XO/view?usp=drive_link"},
+ {t:"Psychology: A Study of Mental Life",a:"Robert S. Woodworth",c:"Class 12",s:"Psychology",ty:"Book",l:"English",y:1921,p:"PDF · 26 MB · 600 pages",mc:11,u:"https://drive.google.com/file/d/1kyFypkhrussSYopFhKQwYLmQuMae68XO/view?usp=drive_link"},
  {t:"Vivek Paper Count Book",a:"Silverline Prestige School",c:"All classes",s:"General",ty:"Book",l:"English",y:2026,p:"Google Drive",u:"https://drive.google.com/file/d/1lcaOo0jpQCbYnZNWpOpsgCCSgWhDA08l/view?usp=drive_link"},
- {t:"Mathematics Textbook for Class X",a:"NCERT",c:"Class 10",s:"Mathematics",ty:"Textbook",l:"English",y:2024,p:"PDF · 12 MB",u:"https://ncert.nic.in/textbook.php?jemh1=0-14"},
+ {t:"Mathematics Textbook for Class X",a:"NCERT",c:"Class 10",s:"Mathematics",ty:"Textbook",l:"English",y:2024,p:"PDF · 12 MB",mc:9,u:"https://ncert.nic.in/textbook.php?jemh1=0-14"},
  {t:"Science Textbook for Class IX",a:"NCERT",c:"Class 9",s:"Science",ty:"Textbook",l:"English",y:2024,p:"PDF · 18 MB",u:"https://ncert.nic.in/textbook.php?iesc1=0-12"},
- {t:"Light – Reflection and Refraction: Chapter Notes",a:"Mr. R. Khanna",c:"Class 10",s:"Science",ty:"Notes",l:"English",y:2025,p:"PDF · 1.2 MB",u:""},
- {t:"Board Exam Question Paper – Mathematics 2025",a:"CBSE",c:"Class 10",s:"Mathematics",ty:"Past paper",l:"English",y:2025,p:"PDF · 0.8 MB",u:""},
+ {t:"Light – Reflection and Refraction: Chapter Notes",a:"Mr. R. Khanna",c:"Class 10",s:"Science",ty:"Notes",l:"English",y:2025,p:"PDF · 1.2 MB",mc:9,u:""},
+ {t:"Board Exam Question Paper – Mathematics 2025",a:"CBSE",c:"Class 10",s:"Mathematics",ty:"Past paper",l:"English",y:2025,p:"PDF · 0.8 MB",mc:9,u:""},
  {t:"Kshitij – Hindi Pathya Pustak",a:"NCERT",c:"Class 9",s:"Hindi",ty:"Textbook",l:"Hindi",y:2024,p:"PDF · 9 MB",u:""},
  {t:"Contemporary India II – Geography",a:"NCERT",c:"Class 10",s:"Social Science",ty:"Textbook",l:"English",y:2024,p:"PDF · 14 MB",u:""},
  {t:"Fractions and Decimals: Practice Worksheet",a:"Ms. P. Iyer",c:"Class 6",s:"Mathematics",ty:"Worksheet",l:"English",y:2025,p:"PDF · 0.4 MB",u:""},
@@ -128,7 +195,7 @@ const ITEMS = [
  {t:"Honeysuckle – English Reader",a:"NCERT",c:"Class 6",s:"English",ty:"Textbook",l:"English",y:2024,p:"PDF · 8 MB",u:""},
  {t:"Computer Basics: Introduction to Scratch",a:"Mr. A. Sinha",c:"Class 5",s:"Computer Science",ty:"Notes",l:"English",y:2025,p:"PDF · 2 MB",u:""},
  {t:"Ganit ka Jadu – Maths",a:"NCERT",c:"Class 3",s:"Mathematics",ty:"Textbook",l:"Hindi",y:2024,p:"PDF · 7 MB",u:""},
- {t:"Pre-Board Question Paper – Science 2025",a:"Silverline Prestige School",c:"Class 10",s:"Science",ty:"Past paper",l:"English",y:2025,p:"PDF · 0.9 MB",u:""},
+ {t:"Pre-Board Question Paper – Science 2025",a:"Silverline Prestige School",c:"Class 10",s:"Science",ty:"Past paper",l:"English",y:2025,p:"PDF · 0.9 MB",mc:9,u:""},
  {t:"Malgudi Days",a:"R. K. Narayan",c:"Class 8",s:"English",ty:"Story book",l:"English",y:2019,p:"EPUB · 3 MB",u:""},
 ];
 const uniq=k=>[...new Set(ITEMS.map(i=>i[k]))];
@@ -144,10 +211,17 @@ const typesEl=document.getElementById('types');
 const q=document.getElementById('q'),cls=document.getElementById('cls'),sub=document.getElementById('sub'),lang=document.getElementById('lang');
 [q,cls,sub,lang].forEach(el=>el.addEventListener('input',render));
 
+// ── WHO IS SIGNED IN ──  user = {name, email, cls}  where cls is 1–12 or 'staff'
+let user=null;
+const allowed=i=>!i.mc||!user||user.cls==='staff'||user.cls>=i.mc;
+
 function render(){
+ if(!user) return;
  const needle=q.value.trim().toLowerCase();
- const list=ITEMS.filter(i=>(!needle||(i.t+' '+i.a+' '+i.s).toLowerCase().includes(needle))&&(!cls.value||i.c===cls.value)&&(!sub.value||i.s===sub.value)&&(!lang.value||i.l===lang.value)&&(!type||i.ty===type));
- document.getElementById('count').textContent=list.length+' of '+ITEMS.length+' resources';
+ const visible=ITEMS.filter(allowed);
+ const list=visible.filter(i=>(!needle||(i.t+' '+i.a+' '+i.s).toLowerCase().includes(needle))&&(!cls.value||i.c===cls.value)&&(!sub.value||i.s===sub.value)&&(!lang.value||i.l===lang.value)&&(!type||i.ty===type));
+ const hid=ITEMS.length-visible.length;
+ document.getElementById('count').innerHTML=list.length+' of '+visible.length+' resources'+(hid?' <span class="hidden-note">· '+hid+' for senior classes not shown</span>':'');
  const g=document.getElementById('grid');g.innerHTML='';
  if(!list.length){g.innerHTML='<div class="empty">No resources match. Try a different search or clear a filter.</div>';return}
  list.forEach(i=>{const c=document.createElement('article');c.className='card';
@@ -158,7 +232,41 @@ function render(){
   g.appendChild(c)});
 }
 function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2200)}
-render();
+
+// ── SIGN-IN FLOW ──
+document.getElementById('gatecrest').src=document.querySelector('.crest img').src;
+const gerr=document.getElementById('gerr');
+function setUser(u){
+ user=u; document.body.classList.toggle('locked',!u);
+ if(u){document.getElementById('uname').textContent=u.name;
+  document.getElementById('uclass').textContent=u.cls==='staff'?'Staff · '+u.email:'Class '+u.cls+' · '+u.email;
+  gerr.textContent=''; render();}
+}
+const configured=!!FIREBASE_CONFIG.apiKey;
+let auth=null;
+if(configured && window.firebase){
+ firebase.initializeApp(FIREBASE_CONFIG); auth=firebase.auth();
+ auth.onAuthStateChanged(u=>{
+  if(!u) return setUser(null);
+  const email=(u.email||'').toLowerCase();
+  if(!email.endsWith('@'+SCHOOL_DOMAIN)){ auth.signOut(); gerr.textContent='Only @'+SCHOOL_DOMAIN+' school accounts can use the library. You signed in as '+email+'.'; return; }
+  setUser({name:u.displayName||email,email,cls:classFromEmail(email)});
+ });
+ document.getElementById('gsignin').onclick=()=>{
+  gerr.textContent='';
+  const p=new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({hd:SCHOOL_DOMAIN,prompt:'select_account'});
+  auth.signInWithPopup(p).catch(e=>{gerr.textContent=e.code==='auth/popup-closed-by-user'?'Sign-in window was closed.':'Sign-in failed: '+e.message});
+ };
+ document.getElementById('signout').onclick=()=>auth.signOut();
+}else{
+ // Not configured yet — show the preview dropdown so the page can be reviewed.
+ document.getElementById('preview').hidden=false;
+ document.getElementById('gsignin').onclick=()=>{gerr.textContent='Sign-in is not set up yet. Paste the Firebase keys at the top of the script.'};
+ document.getElementById('previewas').onchange=e=>{const v=e.target.value; if(!v) return;
+  setUser({name:v==='staff'?'Preview: staff':'Preview: Class '+v+' student',email:(v==='staff'?'teacher':'student.'+v)+'@'+SCHOOL_DOMAIN,cls:v==='staff'?'staff':+v})};
+ document.getElementById('signout').onclick=()=>{setUser(null);document.getElementById('previewas').value=''};
+}
+setUser(null);
 </script>
 
 </body>

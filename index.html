@@ -110,7 +110,7 @@ body.locked .user{display:none}
   </button>
   <div class="err" id="gerr" role="alert"></div>
   <div class="preview" id="preview" hidden>
-    <b>Sign-in is not set up yet</b> (no Firebase keys pasted). Preview the library as:
+    <b>Sign-in is not set up yet</b> (no Google Client ID pasted). Preview the library as:
     <select id="previewas"><option value="">— choose —</option><option value="staff">Staff</option><option value="12">Class 12 student</option><option value="10">Class 10 student</option><option value="7">Class 7 student</option><option value="4">Class 4 student</option></select>
   </div>
   <div class="note">Only accounts issued by Silverline Prestige School can enter. Trouble signing in? Email <a href="mailto:slps@silverlineprestigeschool.com">slps@silverlineprestigeschool.com</a>.</div>
@@ -147,20 +147,19 @@ body.locked .user{display:none}
   <span>slps@silverlineprestigeschool.com · +91 89202 79300</span>
 </div></footer>
 
-<script src="https://cdn.jsdelivr.net/npm/firebase@10.14.1/firebase-app-compat.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/firebase@10.14.1/firebase-auth-compat.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
 // ══════════════════════════════════════════════════════════════════════
 // LOGIN SETTINGS — the only part the school needs to edit for sign-in
 // ══════════════════════════════════════════════════════════════════════
-// 1) Paste the keys from Firebase console → Project settings → Your apps → Web app.
+// 1) Google OAuth Client ID (no Firebase needed). Get it from console.cloud.google.com →
+//    APIs & Services → Credentials → Create credentials → OAuth client ID → Web application,
+//    with the site's address (e.g. https://ithelpdesk-commits.github.io) under "Authorized JavaScript origins".
+//    It looks like  123456789-abc123.apps.googleusercontent.com
 //    Leave empty while testing: the page then offers a "preview as" dropdown instead of real sign-in.
-const FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  appId: ""
-};
+const GOOGLE_CLIENT_ID = "";
+// How long a sign-in is remembered on this device before asking again (hours).
+const SESSION_HOURS = 12;
 // 2) Only Google accounts on this domain may enter.
 const SCHOOL_DOMAIN = "slps.one";
 // 3) How a student's class is read from the login ID (the part before @).
@@ -242,31 +241,41 @@ function setUser(u){
   document.getElementById('uclass').textContent=u.cls==='staff'?'Staff · '+u.email:'Class '+u.cls+' · '+u.email;
   gerr.textContent=''; render();}
 }
-const configured=!!FIREBASE_CONFIG.apiKey;
-let auth=null;
-if(configured && window.firebase){
- firebase.initializeApp(FIREBASE_CONFIG); auth=firebase.auth();
- auth.onAuthStateChanged(u=>{
-  if(!u) return setUser(null);
-  const email=(u.email||'').toLowerCase();
-  if(!email.endsWith('@'+SCHOOL_DOMAIN)){ auth.signOut(); gerr.textContent='Only @'+SCHOOL_DOMAIN+' school accounts can use the library. You signed in as '+email+'.'; return; }
-  setUser({name:u.displayName||email,email,cls:classFromEmail(email)});
- });
- document.getElementById('gsignin').onclick=()=>{
-  gerr.textContent='';
-  const p=new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({hd:SCHOOL_DOMAIN,prompt:'select_account'});
-  auth.signInWithPopup(p).catch(e=>{gerr.textContent=e.code==='auth/popup-closed-by-user'?'Sign-in window was closed.':'Sign-in failed: '+e.message});
- };
- document.getElementById('signout').onclick=()=>auth.signOut();
+const configured=!!GOOGLE_CLIENT_ID;
+const SKEY='slps-library-user';
+function saveSession(u){try{localStorage.setItem(SKEY,JSON.stringify({...u,exp:Date.now()+SESSION_HOURS*36e5}))}catch(e){}}
+function loadSession(){try{const u=JSON.parse(localStorage.getItem(SKEY)||'null');return u&&u.exp>Date.now()?u:null}catch(e){return null}}
+function clearSession(){try{localStorage.removeItem(SKEY)}catch(e){}}
+if(configured){
+ // Google Identity Services: Google's own button signs the user in and hands back an ID token (a signed JWT).
+ const gbtn=document.getElementById('gsignin'); gbtn.hidden=true;
+ const host=document.createElement('div'); host.id='gsi'; host.style.display='flex'; host.style.justifyContent='center'; gbtn.after(host);
+ function onCredential(res){
+  const payload=JSON.parse(atob(res.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+  const email=(payload.email||'').toLowerCase();
+  if(!payload.email_verified||!email.endsWith('@'+SCHOOL_DOMAIN)){
+   gerr.textContent='Only @'+SCHOOL_DOMAIN+' school accounts can use the library. You signed in as '+email+'.';
+   if(window.google) google.accounts.id.disableAutoSelect(); return;
+  }
+  const u={name:payload.name||email,email,cls:classFromEmail(email)}; saveSession(u); setUser(u);
+ }
+ function initGsi(){
+  if(!window.google||!google.accounts){ setTimeout(initGsi,150); return; }
+  google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:onCredential,hd:SCHOOL_DOMAIN,ux_mode:'popup',auto_select:false});
+  google.accounts.id.renderButton(host,{theme:'filled_blue',size:'large',width:360,text:'signin_with',shape:'rectangular'});
+ }
+ initGsi();
+ document.getElementById('signout').onclick=()=>{clearSession(); if(window.google) google.accounts.id.disableAutoSelect(); setUser(null)};
+ const saved=loadSession(); if(saved) setUser(saved);
 }else{
  // Not configured yet — show the preview dropdown so the page can be reviewed.
  document.getElementById('preview').hidden=false;
- document.getElementById('gsignin').onclick=()=>{gerr.textContent='Sign-in is not set up yet. Paste the Firebase keys at the top of the script.'};
+ document.getElementById('gsignin').onclick=()=>{gerr.textContent='Sign-in is not set up yet. Paste the Google Client ID at the top of the script.'};
  document.getElementById('previewas').onchange=e=>{const v=e.target.value; if(!v) return;
   setUser({name:v==='staff'?'Preview: staff':'Preview: Class '+v+' student',email:(v==='staff'?'teacher':'student.'+v)+'@'+SCHOOL_DOMAIN,cls:v==='staff'?'staff':+v})};
  document.getElementById('signout').onclick=()=>{setUser(null);document.getElementById('previewas').value=''};
 }
-setUser(null);
+if(!user) setUser(null);
 </script>
 
 </body>

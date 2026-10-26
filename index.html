@@ -101,6 +101,14 @@ body.locked .user{display:none}
 .gate .reg input:focus,.gate .reg select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .gate .reg .btn{padding:10px 14px;font-size:15px}
 body.gate-busy .gate .btn{opacity:.6;pointer-events:none}
+/* Personal welcome splash (see WELCOME settings) */
+.splash{position:fixed;inset:0;z-index:30;background:#162850;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center}
+.splash img{max-height:60vh;max-width:min(90vw,420px);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.45);border:4px solid #fff}
+.splash h2{font-family:var(--display);font-weight:700;font-size:clamp(28px,5vw,40px);margin:0}
+.splash p{margin:0;opacity:.85}
+.splash .btn{background:#fff;color:#162850;padding:10px 22px;font-size:15px}
+@media (prefers-reduced-motion:no-preference){.splash{animation:fadein .5s}.splash img{animation:pop .6s}}
+@keyframes fadein{from{opacity:0}}@keyframes pop{from{transform:scale(.92);opacity:0}}
 </style>
 </head>
 <body>
@@ -142,7 +150,7 @@ body.gate-busy .gate .btn{opacity:.6;pointer-events:none}
 
   <div class="preview" id="preview" hidden>
     <b>Sign-in is not set up yet</b> (no Google Client ID pasted). Preview the library as:
-    <select id="previewas"><option value="">— choose —</option><option value="staff">Staff</option><option value="12">Class 12 student</option><option value="10">Class 10 student</option><option value="7">Class 7 student</option><option value="4">Class 4 student</option><option value="new">New user (registration form)</option><option value="pending">User awaiting approval</option></select>
+    <select id="previewas"><option value="">— choose —</option><option value="staff">Staff</option><option value="12">Class 12 student</option><option value="10">Class 10 student</option><option value="7">Class 7 student</option><option value="4">Class 4 student</option><option value="new">New user (registration form)</option><option value="pending">User awaiting approval</option><option value="somiya">Somiya (personal welcome)</option></select>
   </div>
   <div class="note">Only accounts issued by Silverline Prestige School can enter. Trouble signing in? Email <a href="mailto:slps@silverlineprestigeschool.com">slps@silverlineprestigeschool.com</a>.</div>
 </div></section>
@@ -221,6 +229,11 @@ function classFromEmail(email){
 }
 // 4) Staff whose IDs happen to contain a number (so the rule above would misread them).
 const STAFF_IDS = ["principal", "library", "office"];
+// 6) Personal welcome: show a photo + greeting before the library for certain login IDs (the part before @).
+//    Put the picture in the welcome/ folder next to index.html.
+const WELCOME = {
+  "somiya": { name: "Somiya", image: "welcome/somiya.jpg", message: "Welcome to the Digital Library!" }
+};
 // 5) Age rating: give an item  mc:9  to hide it from students below Class 9. Items without mc are open to all classes.
 // ══════════════════════════════════════════════════════════════════════
 
@@ -282,7 +295,19 @@ function toast(m){const t=document.createElement('div');t.className='toast';t.te
 // ── SIGN-IN FLOW ──
 document.getElementById('gatecrest').src=document.querySelector('.crest img').src;
 const gerr=document.getElementById('gerr');
+let welcomedId=null;
+function welcomeFor(u){ if(!u) return null; const id=u.email.split('@')[0].toLowerCase(); const k=Object.keys(WELCOME).find(k=>id===k||id.startsWith(k+'.')||id.startsWith(k+'_')||id.endsWith('.'+k)); return k?{id:k,...WELCOME[k]}:null }
+function showSplash(w,then){
+ const d=document.createElement('div'); d.className='splash'; d.setAttribute('role','dialog'); d.setAttribute('aria-label','Welcome');
+ d.innerHTML=`<img src="${w.image}" alt=""><h2>Hello, ${w.name}!</h2><p>${w.message||''}</p><button class="btn" type="button">Continue to library →</button>`;
+ const done=()=>{ if(!d.isConnected) return; d.remove(); then(); };
+ d.querySelector('button').onclick=done; d.querySelector('img').onerror=()=>d.querySelector('img').remove();
+ document.body.appendChild(d); setTimeout(done,6000);
+}
 function setUser(u){
+ const w=welcomeFor(u);
+ if(w&&welcomedId!==w.id){ welcomedId=w.id; showSplash(w,()=>setUser(u)); return; }
+ if(!u) welcomedId=null;
  user=u; document.body.classList.toggle('locked',!u);
  if(u){document.getElementById('uname').textContent=u.name;
   document.getElementById('uclass').textContent=(u.cls==='staff'?'Staff':u.cls?'Class '+u.cls:'Student')+' · '+u.email;
@@ -380,6 +405,7 @@ if(configured){
  document.getElementById('gsignin').onclick=document.getElementById('gcreate').onclick=()=>{gerr.textContent='Sign-in is not set up yet. Paste the Google Client ID at the top of the script.'};
  document.getElementById('previewas').onchange=e=>{const v=e.target.value; if(!v) return;
   if(v==='new'){pendingProfile={name:'Aarav Sharma',email:'aarav.sharma@'+SCHOOL_DOMAIN};document.getElementById('regemail').textContent=pendingProfile.email;document.getElementById('regname').value=pendingProfile.name;showStep('register');return}
+  if(v==='somiya'){setUser({name:'Somiya',email:'somiya@'+SCHOOL_DOMAIN,cls:10});return}
   if(v==='pending'){document.getElementById('pendingmsg').textContent='Your account request (aarav.sharma@'+SCHOOL_DOMAIN+') is waiting for the library to approve it. Please check back later.';showStep('pending');return}
   setUser({name:v==='staff'?'Preview: staff':'Preview: Class '+v+' student',email:(v==='staff'?'teacher':'student.'+v)+'@'+SCHOOL_DOMAIN,cls:v==='staff'?'staff':+v})};
  document.getElementById('signout').onclick=()=>{setUser(null);showStep('signin');document.getElementById('previewas').value=''};

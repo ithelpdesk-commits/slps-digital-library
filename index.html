@@ -183,6 +183,7 @@ main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:co
       <textarea id="giftwish" placeholder="I would love…" required></textarea>
       <button class="btn" id="giftsend" type="submit">Send my wish</button>
       <p class="sent" id="giftsent" hidden></p>
+      <button class="btn quiet" id="giftanother" type="button" hidden>Write another wish</button>
     </form>
     <button class="btn quiet" id="again" type="button" hidden>Celebrate again</button>
     <p class="from" id="from"></p>
@@ -273,10 +274,12 @@ $('giftform').addEventListener('submit',async e=>{
   $('giftsent').textContent='Could not send just now — please check the internet and tap Send again.'; $('giftsent').hidden=false; return;
  }
  try{ localStorage.removeItem('gift-wish-pending') }catch(err){}
- $('giftsent').textContent='Got it! Your wish is on its way to me 💛'; $('giftsent').hidden=false; $('giftsend').hidden=true; $('giftwish').readOnly=true;
+ $('giftsent').textContent='Got it! Your wish is on its way to me 💛'; $('giftsent').hidden=false; $('giftsend').hidden=true; $('giftwish').readOnly=true; $('giftanother').hidden=false;
  $('again').hidden=false; burst(1); hearts(12);
 });
-$('again').addEventListener('click',()=>{
+function resetGiftForm(){ $('giftwish').value=''; $('giftwish').readOnly=false; $('giftsent').hidden=true; $('giftsend').hidden=false; $('giftsend').disabled=false; $('giftsend').textContent='Send my wish'; $('giftanother').hidden=true; }
+$('giftanother').addEventListener('click',()=>{ resetGiftForm(); $('giftwish').focus(); });
+$('again').addEventListener('click',()=>{ resetGiftForm();
  document.querySelectorAll('.candle').forEach(c=>c.classList.remove('out'));
  $('wish').textContent='Make a wish and blow out the candles'; $('blow').hidden=false; $('again').hidden=true; $('giftform').classList.remove('show'); burst(1);
 });

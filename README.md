@@ -1,8 +1,11 @@
-# Silverline Prestige School – Digital Library
+# Silverline Prestige School – web pages
 
-Searchable library page for the SLPS website. Open `index.html`, or enable GitHub Pages to publish it.
+- `index.html` — **Birthday surprise for Rudrakshi (28 Oct 2026).** A sealed gift with a countdown to midnight IST; after that it opens to a greeting, confetti and a cake whose candles can be blown out. Name, date, message, photo and the midnight lock are all in the `EDIT HERE` block at the bottom of the file (set `LOCK_UNTIL_BIRTHDAY = false` to open it any time).
+- `library.html` — the Digital Library page (details below).
 
-To add a resource, edit the `ITEMS` list in `index.html` and put the file link in `u:""`.
+Searchable library page for the SLPS website. Open `library.html`, or enable GitHub Pages to publish it.
+
+To add a resource, edit the `ITEMS` list in `library.html` and put the file link in `u:""`.
 
 ## Login (Google sign-in, @slps.one only)
 
@@ -11,7 +14,7 @@ The page opens on a sign-in screen. Sign-in uses Google Identity Services direct
 1. console.cloud.google.com → create a project → APIs & Services → OAuth consent screen (Internal, for slps.one users).
 2. Credentials → Create credentials → OAuth client ID → Web application → add the site's address under
    **Authorized JavaScript origins** (e.g. `https://ithelpdesk-commits.github.io` and/or `https://silverlineprestigeschool.com`).
-3. Copy the Client ID (`…apps.googleusercontent.com`) into `GOOGLE_CLIENT_ID` at the top of the `<script>` in `index.html`.
+3. Copy the Client ID (`…apps.googleusercontent.com`) into `GOOGLE_CLIENT_ID` at the top of the `<script>` in `library.html`.
 
 Until the Client ID is pasted, the login screen shows a "preview as" dropdown for testing. A sign-in is remembered on the device for `SESSION_HOURS` (12).
 
@@ -20,7 +23,7 @@ Until the Client ID is pasted, the login screen shows a "preview as" dropdown fo
 The login screen has two buttons, **Sign in** and **Create account** (both use the school Google account). First-time users then see a short form (name, optional class/section note). It posts to a Google Form; the librarian approves in the linked Google Sheet; the page reads the sheet to learn each user's class.
 
 1. Create a Google Form with three short-answer questions in this order: **Email, Name, Class/Section**.
-2. Form → ⋮ → *Get pre-filled link* → fill dummy answers → copy the link. Put the `entry.NNNN` ids into `REGISTER_FIELDS` and the form's `.../formResponse` URL into `REGISTER_FORM_URL` in `index.html`.
+2. Form → ⋮ → *Get pre-filled link* → fill dummy answers → copy the link. Put the `entry.NNNN` ids into `REGISTER_FIELDS` and the form's `.../formResponse` URL into `REGISTER_FORM_URL` in `library.html`.
 3. Form → Responses → *Link to Sheets*. In that sheet add two columns headed **Approved** and **Class**.
 4. Sheet → File → Share → *Publish to web* → responses tab, *Comma-separated values (.csv)* → paste the link into `ROSTER_CSV_URL`.
 5. To approve a user, type `yes` in their Approved cell (`no` to refuse) and their class in the Class cell (`7`, `Class 7` or `Staff`). The class is never asked on the login page — the librarian sets it.

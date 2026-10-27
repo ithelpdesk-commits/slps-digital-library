@@ -16,8 +16,8 @@
 html,body{height:100%}
 body{margin:0;font-family:var(--body);color:var(--text);background:radial-gradient(120% 90% at 50% 0%,#ffffff 0%,var(--bg) 45%,var(--peach) 100%);min-height:100vh;overflow-x:hidden}
 .stickers{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
-.stickers img{position:absolute;width:var(--w,120px);transform:rotate(var(--r,0deg));opacity:.75;filter:drop-shadow(0 6px 14px rgba(57,39,25,.18))}
-@media (max-width:700px){.stickers img{opacity:.42}}
+.stickers img{position:absolute;width:var(--w,80px);transform:rotate(var(--r,0deg));opacity:.35;filter:drop-shadow(0 4px 10px rgba(57,39,25,.12))}
+@media (max-width:700px){.stickers img{opacity:.28}}
 @media (prefers-reduced-motion:no-preference){.stickers img{animation:bob var(--d,6s) ease-in-out infinite alternate}}
 @keyframes bob{from{transform:rotate(var(--r,0deg)) translateY(0)}to{transform:rotate(calc(var(--r,0deg) + 3deg)) translateY(-10px)}}
 canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
@@ -188,7 +188,7 @@ const $=id=>document.getElementById(id);
  for(let i=files.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[files[i],files[j]]=[files[j],files[i]]}
  const host=$('stickers'), vw=innerWidth, vh=innerHeight, mobile=vw<700;
  // one sticker per grid cell, leaving the middle column(s) free for the text and the gift
- const cols=mobile?3:6, rows=mobile?4:3, cw=vw/cols, ch=vh/rows, size=Math.min(mobile?74:130,cw*.8);
+ const cols=mobile?3:6, rows=mobile?4:3, cw=vw/cols, ch=vh/rows, size=Math.min(mobile?56:84,cw*.8);
  const cells=[]; for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){ if(mobile?c===1:(c===2||c===3)) continue; cells.push([c,r]); }
  cells.forEach(([c,r],i)=>{
   const img=document.createElement('img'); img.src=files[i%files.length]; img.alt='';

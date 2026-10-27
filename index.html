@@ -197,9 +197,10 @@ const AGE = null;                              // e.g. 16 → candles on the cak
 const PHOTO = "";                              // e.g. "welcome/rudrakshi.jpg" — leave "" for no photo
 const MESSAGE = "Wishing you a year as bright as you are — full of laughter, new adventures, and every dream coming true. I am so lucky to have you.";
 const FROM = "With love, from me";
-// Where her gift wish is sent. Fill ONE of these: a WhatsApp number with country code (e.g. "919818684888") or an email.
-const GIFT_WHATSAPP = "917065263529";
-const GIFT_EMAIL = "";
+// Where her gift wish goes. It is posted silently to ntfy.sh (free relay, no account needed):
+//   read wishes at  https://ntfy.sh/<GIFT_TOPIC>  (kept there 12 hours), and each one is also e-mailed to GIFT_NOTIFY_EMAIL.
+const GIFT_TOPIC = "rudrakshi-gift-8162d6ad";   // keep this secret — anyone who knows it can read the wishes
+const GIFT_NOTIFY_EMAIL = "";                      // your e-mail address, e.g. "name@gmail.com"
 // ═══════════════════════════════════════════
 
 const $=id=>document.getElementById(id);
@@ -258,13 +259,21 @@ $('blow').addEventListener('click',()=>{
  cs.forEach((c,i)=>setTimeout(()=>c.classList.add('out'),i*140));
  setTimeout(()=>{ $('wish').textContent='Your wish is on its way 💫'; burst(1.5); $('blow').hidden=true; $('giftform').classList.add('show'); $('giftwish').focus(); },cs.length*140+300);
 });
-$('giftform').addEventListener('submit',e=>{
+$('giftform').addEventListener('submit',async e=>{
  e.preventDefault();
  const wish=$('giftwish').value.trim(); if(!wish) return;
- const text='Hi! My birthday gift wish: '+wish+' — '+NAME;
- if(GIFT_WHATSAPP){ window.open('https://wa.me/'+GIFT_WHATSAPP.replace(/\D/g,'')+'?text='+encodeURIComponent(text),'_blank','noopener'); }
- else if(GIFT_EMAIL){ location.href='mailto:'+GIFT_EMAIL+'?subject='+encodeURIComponent('Birthday gift wish from '+NAME)+'&body='+encodeURIComponent(text); }
- $('giftsent').textContent='Got it! Your wish is noted 💛'; $('giftsent').hidden=false; $('giftsend').hidden=true; $('giftwish').readOnly=true;
+ $('giftsend').disabled=true; $('giftsend').textContent='Sending…';
+ const headers={'Title':'Gift wish from '+NAME,'Tags':'gift','Priority':'high'};
+ if(GIFT_NOTIFY_EMAIL) headers['Email']=GIFT_NOTIFY_EMAIL;
+ let ok=false;
+ try{ const r=await fetch('https://ntfy.sh/'+GIFT_TOPIC,{method:'POST',headers,body:wish+'\n— '+NAME+', '+new Date().toLocaleString('en-IN')}); ok=r.ok; }catch(err){}
+ if(!ok){ // keep it on this device so it is not lost; she can try again
+  try{ localStorage.setItem('gift-wish-pending',wish) }catch(err){}
+  $('giftsend').disabled=false; $('giftsend').textContent='Send my wish';
+  $('giftsent').textContent='Could not send just now — please check the internet and tap Send again.'; $('giftsent').hidden=false; return;
+ }
+ try{ localStorage.removeItem('gift-wish-pending') }catch(err){}
+ $('giftsent').textContent='Got it! Your wish is on its way to me 💛'; $('giftsent').hidden=false; $('giftsend').hidden=true; $('giftwish').readOnly=true;
  $('again').hidden=false; burst(1); hearts(12);
 });
 $('again').addEventListener('click',()=>{

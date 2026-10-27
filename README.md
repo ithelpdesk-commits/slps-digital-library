@@ -1,6 +1,6 @@
 # Silverline Prestige School – web pages
 
-- `index.html` — **Birthday surprise for Rudrakshi (28 Oct 2026).** A sealed gift with a countdown to midnight IST; after that it opens to a greeting, confetti and a cake whose candles can be blown out. Name, date, message, photo and the midnight lock are all in the `EDIT HERE` block at the bottom of the file (set `LOCK_UNTIL_BIRTHDAY = false` to open it any time).
+- `index.html` — **Birthday surprise for Rudrakshi (28 Oct 2026).** Tap the gift box and it opens to a greeting, confetti and a cake whose candles can be blown out. Name, date, message and photo are in the `EDIT HERE` block at the bottom of the file.
 - `library.html` — the Digital Library page (details below).
 
 Searchable library page for the SLPS website. Open `library.html`, or enable GitHub Pages to publish it.

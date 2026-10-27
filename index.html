@@ -45,11 +45,6 @@ main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:co
 @media (prefers-reduced-motion:no-preference){.box{animation:wiggle 2.6s ease-in-out infinite}.box.open{animation:none}}
 @keyframes wiggle{0%,86%,100%{transform:rotate(0)}89%{transform:rotate(-3deg)}92%{transform:rotate(3deg)}95%{transform:rotate(-2deg)}}
 .hint{font-size:15px;opacity:.8;margin:0}
-.count{display:flex;gap:10px;justify-content:center}
-.count div{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:12px;min-width:68px;padding:10px 8px}
-.count b{display:block;font-family:var(--display);font-size:30px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
-.count span{font-size:12px;opacity:.75}
-.count[hidden]{display:none}
 
 /* ── Stage 2: the reveal ── */
 .reveal{display:none;flex-direction:column;align-items:center;gap:26px;max-width:640px;width:100%}
@@ -92,9 +87,6 @@ main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:co
   <!-- Stage 1 -->
   <section class="gift" id="gift">
     <h1 id="giftTitle">Something is waiting for <em>Rudrakshi</em></h1>
-    <div class="count" id="count" hidden>
-      <div><b id="cd">0</b><span>days</span></div><div><b id="ch">00</b><span>hours</span></div><div><b id="cm">00</b><span>minutes</span></div><div><b id="cs">00</b><span>seconds</span></div>
-    </div>
     <button class="box" id="box" type="button" aria-label="Open your surprise">
       <div class="lid"></div><div class="bow"></div><div class="base"></div>
     </button>
@@ -120,12 +112,11 @@ main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:co
 <script>
 // ════════════════ EDIT HERE ════════════════
 const NAME = "Rudrakshi";
-const BIRTHDAY = "2026-10-28";                 // YYYY-MM-DD — the gift can be opened from midnight (IST) on this day
+const BIRTHDAY = "2026-10-28";                 // YYYY-MM-DD — shown above the greeting
 const AGE = null;                              // e.g. 16 → candles on the cake; null → 5 candles
 const PHOTO = "";                              // e.g. "welcome/rudrakshi.jpg" — leave "" for no photo
 const MESSAGE = "Wishing you a year as bright as you are — full of laughter, new adventures, and every dream coming true. We are so lucky to have you.";
 const FROM = "With love, from all of us";
-const LOCK_UNTIL_BIRTHDAY = true;              // false → gift opens any time (good for testing)
 // ═══════════════════════════════════════════
 
 const $=id=>document.getElementById(id);
@@ -136,21 +127,8 @@ if(PHOTO){$('photo').src=PHOTO;$('photo').hidden=false;$('photo').alt=NAME}
 const nC=AGE?Math.min(AGE,24):5;
 for(let i=0;i<nC;i++){const c=document.createElement('div');c.className='candle';c.innerHTML='<div class="flame"></div>';$('candles').appendChild(c)}
 
-// countdown / lock
-let locked=false;
-function tick(){
- const d=target-Date.now();
- if(!LOCK_UNTIL_BIRTHDAY||d<=0){ if(locked){locked=false;$('count').hidden=true;$('hint').textContent='Tap the gift to open it';$('box').disabled=false} return }
- locked=true; $('count').hidden=false; $('box').disabled=true; $('hint').textContent='Your surprise opens at midnight';
- const s=Math.floor(d/1000);
- $('cd').textContent=Math.floor(s/86400); $('ch').textContent=String(Math.floor(s%86400/3600)).padStart(2,'0');
- $('cm').textContent=String(Math.floor(s%3600/60)).padStart(2,'0'); $('cs').textContent=String(s%60).padStart(2,'0');
-}
-tick(); setInterval(tick,1000);
-
 // open the gift
 $('box').addEventListener('click',()=>{
- if(locked) return;
  $('box').classList.add('open'); $('hint').textContent='';
  burst(1.2);
  setTimeout(()=>{ $('gift').style.display='none'; $('reveal').classList.add('show'); window.scrollTo({top:0}); burst(1); },900);

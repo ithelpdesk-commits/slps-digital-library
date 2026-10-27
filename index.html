@@ -9,72 +9,72 @@
 <style>
 /* ── Settings the family can edit are in the script at the bottom (name, date, message, photo). ── */
 :root{
-  --ink:#2a1340; --plum:#4b1d6b; --night:#1b0b2e; --rose:#ff7aa2; --marigold:#ffc247; --cream:#fff6ea; --mint:#7fe3c9;
+  --bg:#FFF1F2; --accent:#E11D48; --text:#881337; --accent-soft:#FB7185; --blush:#FFE4E6; --gold:#F59E0B; --white:#ffffff;
   --display:'Fraunces',Georgia,serif; --body:'Nunito','Segoe UI',system-ui,sans-serif;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;font-family:var(--body);color:var(--cream);background:radial-gradient(120% 90% at 50% 0%,#5a2a84 0%,var(--plum) 45%,var(--night) 100%);min-height:100vh;overflow-x:hidden}
+body{margin:0;font-family:var(--body);color:var(--text);background:radial-gradient(120% 90% at 50% 0%,#ffffff 0%,var(--bg) 45%,var(--blush) 100%);min-height:100vh;overflow-x:hidden}
 canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
 
 /* stars */
 .stars{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:
- radial-gradient(1.5px 1.5px at 12% 18%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 28% 62%,#fff 50%,transparent 51%),
- radial-gradient(2px 2px at 44% 30%,#ffe9b0 50%,transparent 51%),radial-gradient(1px 1px at 58% 74%,#fff 50%,transparent 51%),
- radial-gradient(1.5px 1.5px at 72% 22%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 86% 58%,#fff 50%,transparent 51%),
- radial-gradient(2px 2px at 92% 12%,#ffe9b0 50%,transparent 51%),radial-gradient(1px 1px at 8% 84%,#fff 50%,transparent 51%),
- radial-gradient(1.5px 1.5px at 36% 92%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 64% 8%,#fff 50%,transparent 51%);opacity:.7}
+ radial-gradient(3px 3px at 12% 18%,#FDA4AF 50%,transparent 51%),radial-gradient(2px 2px at 28% 62%,#E11D48 50%,transparent 51%),
+ radial-gradient(4px 4px at 44% 30%,#FCD34D 50%,transparent 51%),radial-gradient(2px 2px at 58% 74%,#FDA4AF 50%,transparent 51%),
+ radial-gradient(3px 3px at 72% 22%,#E11D48 50%,transparent 51%),radial-gradient(2px 2px at 86% 58%,#FCD34D 50%,transparent 51%),
+ radial-gradient(4px 4px at 92% 12%,#FDA4AF 50%,transparent 51%),radial-gradient(2px 2px at 8% 84%,#E11D48 50%,transparent 51%),
+ radial-gradient(3px 3px at 36% 92%,#FCD34D 50%,transparent 51%),radial-gradient(2px 2px at 64% 8%,#FDA4AF 50%,transparent 51%);opacity:.5}
 
 main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px 48px;text-align:center}
 
 /* ── Stage 1: the sealed gift ── */
 .gift{display:flex;flex-direction:column;align-items:center;gap:22px;max-width:520px}
 .gift h1{font-family:var(--display);font-weight:500;font-size:clamp(28px,6vw,44px);line-height:1.1;margin:0;font-variation-settings:'opsz' 144}
-.gift h1 em{font-style:italic;color:var(--marigold)}
+.gift h1 em{font-style:italic;color:var(--accent)}
 .box{position:relative;width:200px;height:190px;cursor:pointer;background:none;border:0;padding:0;outline-offset:8px}
-.box:focus-visible{outline:3px solid var(--marigold);border-radius:12px}
-.box .base{position:absolute;left:20px;right:20px;bottom:0;height:120px;background:linear-gradient(#ff8db1,#e8557f);border-radius:8px 8px 14px 14px;box-shadow:0 18px 40px rgba(0,0,0,.35)}
-.box .base::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:28px;transform:translateX(-50%);background:var(--marigold)}
-.box .lid{position:absolute;left:4px;right:4px;top:48px;height:46px;background:linear-gradient(#ffa6c3,#ff7aa2);border-radius:8px;transform-origin:8% 100%;transition:transform .7s cubic-bezier(.3,1.4,.5,1);box-shadow:0 8px 18px rgba(0,0,0,.25)}
-.box .lid::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:28px;transform:translateX(-50%);background:var(--marigold)}
+.box:focus-visible{outline:3px solid var(--accent);border-radius:12px}
+.box .base{position:absolute;left:20px;right:20px;bottom:0;height:120px;background:linear-gradient(#F43F5E,#BE123C);border-radius:8px 8px 14px 14px;box-shadow:0 18px 40px rgba(136,19,55,.25)}
+.box .base::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:28px;transform:translateX(-50%);background:var(--gold)}
+.box .lid{position:absolute;left:4px;right:4px;top:48px;height:46px;background:linear-gradient(#FB7185,#E11D48);border-radius:8px;transform-origin:8% 100%;transition:transform .7s cubic-bezier(.3,1.4,.5,1);box-shadow:0 8px 18px rgba(136,19,55,.2)}
+.box .lid::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:28px;transform:translateX(-50%);background:var(--gold)}
 .box .bow{position:absolute;left:50%;top:14px;width:70px;height:40px;transform:translateX(-50%);transition:transform .7s cubic-bezier(.3,1.4,.5,1)}
-.box .bow::before,.box .bow::after{content:"";position:absolute;top:0;width:34px;height:34px;border:9px solid var(--marigold);border-radius:50% 50% 0 50%}
+.box .bow::before,.box .bow::after{content:"";position:absolute;top:0;width:34px;height:34px;border:9px solid var(--gold);border-radius:50% 50% 0 50%}
 .box .bow::before{left:0;transform:rotate(-35deg)}.box .bow::after{right:0;transform:rotate(55deg)}
 .box.open .lid{transform:rotate(-78deg) translateY(-10px)}
 .box.open .bow{transform:translateX(-50%) rotate(-78deg) translate(-60px,20px)}
 @media (prefers-reduced-motion:no-preference){.box{animation:wiggle 2.6s ease-in-out infinite}.box.open{animation:none}}
 @keyframes wiggle{0%,86%,100%{transform:rotate(0)}89%{transform:rotate(-3deg)}92%{transform:rotate(3deg)}95%{transform:rotate(-2deg)}}
-.hint{font-size:15px;opacity:.8;margin:0}
+.hint{font-size:15px;opacity:.75;margin:0}
 
 /* ── Stage 2: the reveal ── */
 .reveal{display:none;flex-direction:column;align-items:center;gap:26px;max-width:640px;width:100%}
 .reveal.show{display:flex}
 .reveal h1{font-family:var(--display);font-weight:700;font-size:clamp(40px,10vw,84px);line-height:.95;margin:0;font-variation-settings:'opsz' 144;letter-spacing:-.01em}
-.reveal h1 small{display:block;font-weight:500;font-style:italic;font-size:.42em;color:var(--marigold);letter-spacing:0;margin-bottom:10px}
-.photo{width:min(72vw,280px);aspect-ratio:3/4;border-radius:16px 16px 60px 16px;object-fit:cover;border:6px solid var(--cream);box-shadow:0 20px 50px rgba(0,0,0,.4);transform:rotate(-3deg)}
+.reveal h1 small{display:block;font-weight:500;font-style:italic;font-size:.42em;color:var(--accent);letter-spacing:0;margin-bottom:10px}
+.photo{width:min(72vw,280px);aspect-ratio:3/4;border-radius:16px 16px 60px 16px;object-fit:cover;border:6px solid var(--white);box-shadow:0 20px 50px rgba(136,19,55,.25);transform:rotate(-3deg)}
 .photo[hidden]{display:none}
-.msg{font-size:clamp(17px,2.4vw,20px);line-height:1.6;max-width:46ch;margin:0;color:#ffe9d2}
-.msg strong{color:var(--marigold);font-weight:700}
+.msg{font-size:clamp(17px,2.4vw,20px);line-height:1.6;max-width:46ch;margin:0;color:var(--text)}
+.msg strong{color:var(--accent);font-weight:700}
 
 /* cake */
 .cake{position:relative;width:240px;height:200px;margin-top:6px}
-.cake .plate{position:absolute;left:0;right:0;bottom:0;height:16px;border-radius:50%;background:rgba(255,255,255,.22)}
-.cake .tier{position:absolute;left:50%;transform:translateX(-50%);border-radius:10px 10px 4px 4px;background:linear-gradient(#f6c8e0,#e39ac0)}
+.cake .plate{position:absolute;left:0;right:0;bottom:0;height:16px;border-radius:50%;background:rgba(136,19,55,.15)}
+.cake .tier{position:absolute;left:50%;transform:translateX(-50%);border-radius:10px 10px 4px 4px;background:linear-gradient(#FDA4AF,#F43F5E)}
 .cake .t1{bottom:10px;width:220px;height:62px}.cake .t2{bottom:70px;width:170px;height:54px}
-.cake .tier::before{content:"";position:absolute;left:0;right:0;top:0;height:20px;border-radius:10px 10px 50% 50%/10px 10px 100% 100%;background:var(--cream)}
+.cake .tier::before{content:"";position:absolute;left:0;right:0;top:0;height:20px;border-radius:10px 10px 50% 50%/10px 10px 100% 100%;background:var(--white)}
 .candles{position:absolute;left:50%;transform:translateX(-50%);bottom:122px;display:flex;gap:16px}
-.candle{position:relative;width:12px;height:38px;border-radius:3px;background:repeating-linear-gradient(135deg,#fff 0 6px,var(--rose) 6px 12px)}
-.flame{position:absolute;left:50%;top:-20px;width:14px;height:22px;transform:translateX(-50%);border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:radial-gradient(circle at 50% 70%,#fff8 0,var(--marigold) 35%,#ff7a1a 70%,transparent 72%);filter:drop-shadow(0 0 8px #ffb347);transform-origin:50% 100%}
+.candle{position:relative;width:12px;height:38px;border-radius:3px;background:repeating-linear-gradient(135deg,#fff 0 6px,var(--accent) 6px 12px)}
+.flame{position:absolute;left:50%;top:-20px;width:14px;height:22px;transform:translateX(-50%);border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:radial-gradient(circle at 50% 70%,#fff8 0,#FCD34D 35%,#F97316 70%,transparent 72%);filter:drop-shadow(0 0 8px #FBBF24);transform-origin:50% 100%}
 @media (prefers-reduced-motion:no-preference){.flame{animation:flicker .6s ease-in-out infinite alternate}}
 @keyframes flicker{from{transform:translateX(-50%) scale(1,1) rotate(-3deg)}to{transform:translateX(-50%) scale(.9,1.08) rotate(3deg)}}
 .candle.out .flame{animation:none;opacity:0;transition:opacity .25s}
 .candle.out::after{content:"";position:absolute;left:50%;top:-30px;width:6px;height:26px;transform:translateX(-50%);border-radius:50%;background:linear-gradient(#bbb8,transparent);animation:smoke 1.6s ease-out forwards}
 @keyframes smoke{to{transform:translate(-50%,-30px) scale(1.6);opacity:0}}
 
-.btn{font:inherit;font-weight:700;font-size:16px;color:var(--ink);background:var(--marigold);border:0;border-radius:999px;padding:13px 26px;cursor:pointer;box-shadow:0 10px 24px rgba(0,0,0,.3)}
-.btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
-.btn.quiet{background:transparent;color:var(--cream);border:1.5px solid rgba(255,255,255,.4);box-shadow:none}
-.wish{font-family:var(--display);font-style:italic;font-size:22px;color:var(--mint);margin:0;min-height:1.4em}
+.btn{font:inherit;font-weight:700;font-size:16px;color:#fff;background:var(--accent);border:0;border-radius:999px;padding:13px 26px;cursor:pointer;box-shadow:0 10px 24px rgba(225,29,72,.3)}
+.btn:focus-visible{outline:3px solid var(--text);outline-offset:3px}
+.btn.quiet{background:transparent;color:var(--text);border:1.5px solid rgba(136,19,55,.35);box-shadow:none}
+.wish{font-family:var(--display);font-style:italic;font-size:22px;color:var(--accent);margin:0;min-height:1.4em}
 .from{font-size:14px;opacity:.7;margin:10px 0 0}
 .from a{color:inherit}
 </style>
@@ -149,7 +149,7 @@ $('again').addEventListener('click',()=>{
 const cv=$('fx'),ctx=cv.getContext('2d');let parts=[],raf=null;
 function size(){cv.width=innerWidth*devicePixelRatio;cv.height=innerHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
 size();addEventListener('resize',size);
-const COLORS=['#ffc247','#ff7aa2','#7fe3c9','#fff6ea','#b388ff'];
+const COLORS=['#E11D48','#FB7185','#FCD34D','#881337','#ffffff'];
 function burst(k){
  if(matchMedia('(prefers-reduced-motion:reduce)').matches) return;
  const n=Math.round(140*k);

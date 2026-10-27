@@ -31,19 +31,41 @@ main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:co
 .gift{display:flex;flex-direction:column;align-items:center;gap:22px;max-width:520px}
 .gift h1{font-family:var(--display);font-weight:500;font-size:clamp(28px,6vw,44px);line-height:1.1;margin:0;font-variation-settings:'opsz' 144}
 .gift h1 em{font-style:italic;color:var(--accent)}
-.box{position:relative;width:200px;height:190px;cursor:pointer;background:none;border:0;padding:0;outline-offset:8px}
+/* ── 3-D gift box (CSS transforms, no images) ── */
+.box{position:relative;width:240px;height:230px;cursor:pointer;background:none;border:0;padding:0;outline-offset:8px;perspective:900px}
 .box:focus-visible{outline:3px solid var(--accent);border-radius:12px}
-.box .base{position:absolute;left:20px;right:20px;bottom:0;height:120px;background:linear-gradient(#FFF8E6,var(--box) 40%,#F1DDB0);border:1px solid #E9D3A3;border-radius:8px 8px 14px 14px;box-shadow:0 18px 40px rgba(57,39,25,.18);transition:box-shadow .5s}
-.box .base::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:28px;transform:translateX(-50%);background:var(--gold)}
-.box .lid{position:absolute;left:4px;right:4px;top:48px;height:46px;background:linear-gradient(#FFF8E6,var(--box));border:1px solid #E9D3A3;border-radius:8px;transform-origin:8% 100%;transition:transform .7s cubic-bezier(.3,1.4,.5,1);box-shadow:0 8px 18px rgba(57,39,25,.15)}
-.box .lid::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:28px;transform:translateX(-50%);background:var(--gold)}
-.box .bow{position:absolute;left:50%;top:14px;width:70px;height:40px;transform:translateX(-50%);transition:transform .7s cubic-bezier(.3,1.4,.5,1)}
-.box .bow::before,.box .bow::after{content:"";position:absolute;top:0;width:34px;height:34px;border:9px solid var(--gold);border-radius:50% 50% 0 50%}
-.box .bow::before{left:0;transform:rotate(-35deg)}.box .bow::after{right:0;transform:rotate(55deg)}
-.box.open .lid{transform:translateY(-130px) rotate(-18deg);opacity:0;transition:transform .9s cubic-bezier(.2,.9,.3,1),opacity .9s ease .2s}
-.box.open .bow{transform:translateX(-50%) translateY(-150px) rotate(-30deg);opacity:0;transition:transform .9s cubic-bezier(.2,.9,.3,1),opacity .9s ease .2s}
-@media (prefers-reduced-motion:no-preference){.box:hover:not(.open),.box:focus-visible:not(.open){animation:shake .5s ease-in-out infinite}.box.open .base{box-shadow:0 18px 40px rgba(57,39,25,.18),0 0 0 14px rgba(212,162,76,.18),0 0 60px 20px rgba(212,162,76,.45)}.box.open::before{content:"";position:absolute;inset:-40px;border-radius:50%;background:radial-gradient(circle,rgba(255,235,180,.9) 0%,rgba(212,162,76,.35) 40%,transparent 70%);animation:glow 1.6s ease-out forwards;pointer-events:none}}
-@keyframes shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-4deg) translateX(-2px)}75%{transform:rotate(4deg) translateX(2px)}}
+.scene{position:absolute;left:50%;bottom:16px;width:var(--w);height:var(--h);margin-left:calc(var(--w)/-2);transform-style:preserve-3d;transform:rotateX(-24deg) rotateY(-30deg);--w:130px;--h:104px;--d:130px}
+.face{position:absolute;left:0;top:0;width:var(--w);height:var(--h);background:var(--box);border:1px solid #E6CFA0;backface-visibility:hidden}
+.face.front{transform:translateZ(calc(var(--d)/2))}
+.face.back{transform:rotateY(180deg) translateZ(calc(var(--d)/2))}
+.face.left{width:var(--d);transform:rotateY(-90deg) translateZ(calc(var(--w)/2));background:#F2DDB2}
+.face.right{width:var(--d);transform:rotateY(90deg) translateZ(calc(var(--w)/2));background:#F8E8C6}
+.face.bottom{height:var(--d);top:calc((var(--h) - var(--d))/2);transform:rotateX(-90deg) translateZ(calc(var(--h)/2));background:#E4CC9C}
+.face.top{height:var(--d);top:calc((var(--h) - var(--d))/2);transform:rotateX(90deg) translateZ(calc(var(--h)/2));background:#FFF8E6}
+/* vertical ribbon on the side faces, cross ribbon on top */
+.face.front::after,.face.back::after,.face.left::after,.face.right::after{content:"";position:absolute;top:0;bottom:0;left:50%;width:24px;transform:translateX(-50%);background:var(--gold)}
+.face.top::before,.face.top::after{content:"";position:absolute;background:var(--gold)}
+.face.top::before{top:0;bottom:0;left:50%;width:24px;transform:translateX(-50%)}
+.face.top::after{left:0;right:0;top:50%;height:24px;transform:translateY(-50%)}
+/* the lid: a shallow box sitting on top */
+.lid3{position:absolute;left:50%;bottom:calc(var(--h) - 2px);width:var(--lw);height:var(--lh);margin-left:calc(var(--lw)/-2);transform-style:preserve-3d;--lw:142px;--lh:28px;--ld:142px;transform-origin:50% 100% calc(var(--ld)/-2);transition:transform .9s cubic-bezier(.2,.9,.3,1),opacity .6s ease .4s}
+.lid3 .face{width:var(--lw);height:var(--lh);background:#FFF8E6}
+.lid3 .face.front{transform:translateZ(calc(var(--ld)/2))}
+.lid3 .face.back{transform:rotateY(180deg) translateZ(calc(var(--ld)/2))}
+.lid3 .face.left{width:var(--ld);transform:rotateY(-90deg) translateZ(calc(var(--lw)/2));background:#F2DDB2}
+.lid3 .face.right{width:var(--ld);transform:rotateY(90deg) translateZ(calc(var(--lw)/2));background:#F8E8C6}
+.lid3 .face.top{height:var(--ld);top:calc((var(--lh) - var(--ld))/2);transform:rotateX(90deg) translateZ(calc(var(--lh)/2));background:#FFFBF0}
+.lid3 .face.bottom{display:none}
+.bow{position:absolute;left:50%;top:50%;width:64px;height:40px;transform:translate(-50%,-50%)}
+.bow::before,.bow::after{content:"";position:absolute;top:0;width:30px;height:30px;border:8px solid var(--gold);border-radius:50% 50% 0 50%}
+.bow::before{left:0;transform:rotate(-35deg)}.bow::after{right:0;transform:rotate(55deg)}
+.bow i{position:absolute;left:50%;top:22px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:#B8873A}
+.box.open .lid3{transform:rotateX(-115deg) translateY(-60px) translateZ(-30px);opacity:0}
+/* inside of the box glows when open */
+.glowin{position:absolute;left:0;top:calc((var(--h) - var(--d))/2);width:var(--w);height:var(--d);transform:rotateX(90deg) translateZ(calc(var(--h)/2 - 2px));background:radial-gradient(circle,#FFE9B5,#F3D9A4 60%,#E4CC9C);opacity:0;transition:opacity .5s ease .3s}
+.box.open .glowin{opacity:1;box-shadow:0 0 50px 20px rgba(255,220,150,.9)}
+@media (prefers-reduced-motion:no-preference){.box:hover:not(.open) .scene,.box:focus-visible:not(.open) .scene{animation:shake .5s ease-in-out infinite}.box.open::before{content:"";position:absolute;inset:-30px;border-radius:50%;background:radial-gradient(circle,rgba(255,235,180,.95) 0%,rgba(212,162,76,.35) 40%,transparent 70%);animation:glow 1.6s ease-out forwards;pointer-events:none}}
+@keyframes shake{0%,100%{transform:rotateX(-24deg) rotateY(-30deg) rotateZ(0)}25%{transform:rotateX(-24deg) rotateY(-34deg) rotateZ(-3deg) translateX(-3px)}75%{transform:rotateX(-24deg) rotateY(-26deg) rotateZ(3deg) translateX(3px)}}
 @keyframes glow{from{transform:scale(.4);opacity:0}25%{opacity:1}70%{opacity:.8}to{transform:scale(1.7);opacity:0}}
 .hint{font-size:15px;opacity:.75;margin:0}
 
@@ -91,7 +113,13 @@ main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:co
   <section class="gift" id="gift">
     <h1 id="giftTitle">Something is waiting for <em>Rudrakshi</em></h1>
     <button class="box" id="box" type="button" aria-label="Open your surprise">
-      <div class="lid"></div><div class="bow"></div><div class="base"></div>
+      <div class="scene">
+        <div class="face back"></div><div class="face left"></div><div class="face bottom"></div><div class="glowin"></div>
+        <div class="face right"></div><div class="face front"></div>
+        <div class="lid3">
+          <div class="face back"></div><div class="face left"></div><div class="face right"></div><div class="face top"><div class="bow"><i></i></div></div><div class="face front"></div>
+        </div>
+      </div>
     </button>
     <p class="hint" id="hint">Tap the gift to open it</p>
   </section>

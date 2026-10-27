@@ -121,6 +121,15 @@ main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:co
 .btn.quiet{background:transparent;color:var(--text);border:1.5px solid rgba(57,39,25,.35);box-shadow:none}
 .wish{font-family:var(--display);font-style:italic;font-size:22px;color:var(--accent);margin:0;min-height:1.4em}
 .from{font-size:14px;opacity:.7;margin:10px 0 0}
+/* gift request, shown after the candles are out */
+.giftform{display:none;flex-direction:column;gap:12px;width:min(100%,440px);background:rgba(255,255,255,.75);border:1px solid rgba(212,162,76,.5);border-radius:16px;padding:20px;text-align:left;backdrop-filter:blur(6px)}
+.giftform.show{display:flex}
+.giftform h3{font-family:var(--display);font-weight:700;font-size:24px;margin:0;color:#2A1A0E}
+.giftform p{margin:0;font-size:15px;color:#2A1A0E}
+.giftform textarea{font:inherit;font-size:16px;padding:12px;border:1.5px solid rgba(57,39,25,.3);border-radius:10px;background:#fff;color:#2A1A0E;min-height:90px;resize:vertical}
+.giftform textarea:focus{outline:2px solid var(--gold);outline-offset:1px}
+.giftform .btn{align-self:flex-start}
+.giftform .sent{font-weight:700;color:#7A4A1E}
 .from a{color:inherit}
 </style>
 </head>
@@ -168,6 +177,13 @@ main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:co
     </div>
     <p class="wish" id="wish">Make a wish and blow out the candles</p>
     <button class="btn" id="blow" type="button">Blow out the candles</button>
+    <form class="giftform" id="giftform">
+      <h3>Write a gift you need 🎁</h3>
+      <p>Tell me what you would love, and I will make it happen.</p>
+      <textarea id="giftwish" placeholder="I would love…" required></textarea>
+      <button class="btn" id="giftsend" type="submit">Send my wish</button>
+      <p class="sent" id="giftsent" hidden></p>
+    </form>
     <button class="btn quiet" id="again" type="button" hidden>Celebrate again</button>
     <p class="from" id="from"></p>
   </section>
@@ -181,6 +197,9 @@ const AGE = null;                              // e.g. 16 → candles on the cak
 const PHOTO = "";                              // e.g. "welcome/rudrakshi.jpg" — leave "" for no photo
 const MESSAGE = "Wishing you a year as bright as you are — full of laughter, new adventures, and every dream coming true. I am so lucky to have you.";
 const FROM = "With love, from me";
+// Where her gift wish is sent. Fill ONE of these: a WhatsApp number with country code (e.g. "919818684888") or an email.
+const GIFT_WHATSAPP = "";
+const GIFT_EMAIL = "";
 // ═══════════════════════════════════════════
 
 const $=id=>document.getElementById(id);
@@ -237,11 +256,20 @@ $('box').addEventListener('click',()=>{
 $('blow').addEventListener('click',()=>{
  const cs=[...document.querySelectorAll('.candle')];
  cs.forEach((c,i)=>setTimeout(()=>c.classList.add('out'),i*140));
- setTimeout(()=>{ $('wish').textContent='Your wish is on its way 💫'; burst(1.5); $('blow').hidden=true; $('again').hidden=false; },cs.length*140+300);
+ setTimeout(()=>{ $('wish').textContent='Your wish is on its way 💫'; burst(1.5); $('blow').hidden=true; $('giftform').classList.add('show'); $('giftwish').focus(); },cs.length*140+300);
+});
+$('giftform').addEventListener('submit',e=>{
+ e.preventDefault();
+ const wish=$('giftwish').value.trim(); if(!wish) return;
+ const text='Hi! My birthday gift wish: '+wish+' — '+NAME;
+ if(GIFT_WHATSAPP){ window.open('https://wa.me/'+GIFT_WHATSAPP.replace(/\D/g,'')+'?text='+encodeURIComponent(text),'_blank','noopener'); }
+ else if(GIFT_EMAIL){ location.href='mailto:'+GIFT_EMAIL+'?subject='+encodeURIComponent('Birthday gift wish from '+NAME)+'&body='+encodeURIComponent(text); }
+ $('giftsent').textContent='Got it! Your wish is noted 💛'; $('giftsent').hidden=false; $('giftsend').hidden=true; $('giftwish').readOnly=true;
+ $('again').hidden=false; burst(1); hearts(12);
 });
 $('again').addEventListener('click',()=>{
  document.querySelectorAll('.candle').forEach(c=>c.classList.remove('out'));
- $('wish').textContent='Make a wish and blow out the candles'; $('blow').hidden=false; $('again').hidden=true; burst(1);
+ $('wish').textContent='Make a wish and blow out the candles'; $('blow').hidden=false; $('again').hidden=true; $('giftform').classList.remove('show'); burst(1);
 });
 
 // floating hearts

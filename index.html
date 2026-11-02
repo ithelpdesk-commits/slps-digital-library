@@ -13,14 +13,14 @@
 }
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;font-family:var(--body);color:var(--text);background:radial-gradient(120% 90% at 50% 0%,#ffffff 0%,var(--bg) 45%,var(--peach) 100%);min-height:100vh;overflow-x:hidden}
+body{margin:0;font-family:var(--body);color:var(--text);background:var(--peach);min-height:100vh;overflow-x:hidden}
 canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
-.stars{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0;background-color:var(--bg);background-image:
  radial-gradient(3px 3px at 12% 18%,#D4A24C 50%,transparent 51%),radial-gradient(2px 2px at 28% 62%,#C98A6B 50%,transparent 51%),
  radial-gradient(4px 4px at 44% 30%,#F3D9A4 50%,transparent 51%),radial-gradient(2px 2px at 58% 74%,#D4A24C 50%,transparent 51%),
  radial-gradient(3px 3px at 72% 22%,#C98A6B 50%,transparent 51%),radial-gradient(2px 2px at 86% 58%,#F3D9A4 50%,transparent 51%),
  radial-gradient(4px 4px at 92% 12%,#D4A24C 50%,transparent 51%),radial-gradient(2px 2px at 8% 84%,#C98A6B 50%,transparent 51%),
- radial-gradient(3px 3px at 36% 92%,#F3D9A4 50%,transparent 51%),radial-gradient(2px 2px at 64% 8%,#D4A24C 50%,transparent 51%);opacity:.45}
+ radial-gradient(3px 3px at 36% 92%,#F3D9A4 50%,transparent 51%),radial-gradient(2px 2px at 64% 8%,#D4A24C 50%,transparent 51%),radial-gradient(120% 90% at 50% 0%,#ffffff 0%,var(--bg) 45%,var(--peach) 100%);opacity:1}
 
 main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px 48px;text-align:center}
 
@@ -92,6 +92,35 @@ main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:co
 .noteform textarea:focus{outline:2px solid var(--gold);outline-offset:1px}
 .noteform .btn{align-self:flex-start}
 .noteform .sent{font-weight:700;color:#7A4A1E}
+/* ── Games ── */
+.games{width:min(100%,520px);display:flex;flex-direction:column;gap:14px;margin-top:8px}
+.games h2{font-family:var(--display);font-weight:700;font-size:30px;margin:0;color:var(--ink)}
+.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.tab{font:inherit;font-weight:700;font-size:14px;padding:9px 16px;border-radius:999px;border:1.5px solid rgba(57,39,25,.3);background:#fff;color:var(--ink);cursor:pointer}
+.tab[aria-selected="true"]{background:var(--gold);color:#fff;border-color:var(--gold)}
+.tab:focus-visible{outline:3px solid var(--text);outline-offset:2px}
+.panel{display:none;flex-direction:column;align-items:center;gap:12px;background:rgba(255,255,255,.75);border:1px solid rgba(212,162,76,.5);border-radius:16px;padding:18px;backdrop-filter:blur(6px)}
+.panel.show{display:flex}
+.panel p{margin:0;color:var(--ink);font-size:15px}
+.panel .line{font-family:var(--display);font-style:italic;font-weight:700;font-size:20px;color:#7A4A1E;min-height:1.5em;text-align:center}
+/* 1 · catch the hearts */
+.sky{position:relative;width:100%;height:260px;border-radius:12px;background:linear-gradient(#fff8ee,#ffe9d6);overflow:hidden;border:1px solid rgba(212,162,76,.4)}
+.fly{position:absolute;bottom:-40px;font-size:var(--s,30px);color:var(--rosegold);cursor:pointer;user-select:none;background:none;border:0;padding:4px;line-height:1;animation:rise var(--t,5s) linear forwards}
+.fly:nth-child(odd){color:var(--gold)}
+@keyframes rise{to{transform:translateY(-340px) rotate(20deg)}}
+.fly.pop{animation:pop .35s ease-out forwards}
+@keyframes pop{to{transform:scale(2.2);opacity:0}}
+.score{font-weight:700;color:var(--ink)}
+/* 2 · scratch card */
+.scratch{position:relative;width:min(100%,360px);aspect-ratio:16/9;border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(57,39,25,.15);touch-action:none}
+.scratch .under{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;text-align:center;background:#fff;color:var(--ink);font-family:var(--display);font-weight:700;font-size:20px;line-height:1.3}
+.scratch canvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
+/* 3 · love meter */
+.meter{position:relative;width:150px;height:140px;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none}
+.meter svg{width:100%;height:100%;display:block}
+.meter .fillrect{transition:height .08s linear}
+.meter .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:28px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.35);pointer-events:none}
+@media (prefers-reduced-motion:no-preference){.meter.full{animation:beat .6s ease-in-out 3}}
 </style>
 </head>
 <body>
@@ -130,6 +159,38 @@ main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:co
       <p class="sent" id="notesent" hidden></p>
       <button class="btn quiet" id="noteanother" type="button" hidden>Write another note</button>
     </form>
+    <section class="games" id="games">
+      <h2>Play a little 💛</h2>
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" aria-selected="true" data-p="p1" type="button">Catch the hearts</button>
+        <button class="tab" role="tab" aria-selected="false" data-p="p2" type="button">Scratch card</button>
+        <button class="tab" role="tab" aria-selected="false" data-p="p3" type="button">Love meter</button>
+      </div>
+      <div class="panel show" id="p1" role="tabpanel">
+        <p>Tap the hearts as they float by — each one tells you something.</p>
+        <div class="sky" id="sky"></div>
+        <div class="score" id="score">0 caught</div>
+        <div class="line" id="line1"></div>
+        <button class="btn" id="startCatch" type="button">Start</button>
+      </div>
+      <div class="panel" id="p2" role="tabpanel">
+        <p>Scratch the gold with your finger or mouse.</p>
+        <div class="scratch" id="scratch"><div class="under" id="under"></div><canvas id="scratchcv"></canvas></div>
+        <button class="btn quiet" id="newCard" type="button">New card</button>
+      </div>
+      <div class="panel" id="p3" role="tabpanel">
+        <p>Press and hold the heart to see how much I appreciate you.</p>
+        <div class="meter" id="meter">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <defs><clipPath id="hclip"><path d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 2.6 5 6.3 5c2.2 0 3.5 1.3 4.7 2.9C12.2 6.3 13.5 5 15.7 5c3.7 0 5.4 3.6 3.9 6.9C19.5 16.4 12 21 12 21z"/></clipPath></defs>
+            <path d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 2.6 5 6.3 5c2.2 0 3.5 1.3 4.7 2.9C12.2 6.3 13.5 5 15.7 5c3.7 0 5.4 3.6 3.9 6.9C19.5 16.4 12 21 12 21z" fill="#fff" stroke="#D4A24C" stroke-width=".8"/>
+            <rect class="fillrect" id="fillrect" x="0" y="24" width="24" height="0" fill="#E0565B" clip-path="url(#hclip)"/>
+          </svg>
+          <div class="pct" id="pct">0%</div>
+        </div>
+        <div class="line" id="line3">Hold…</div>
+      </div>
+    </section>
     <button class="btn quiet" id="again" type="button">Read it again</button>
   </section>
 </main>
@@ -140,6 +201,16 @@ const NAME = "Laali";
 const PHOTO = "";                              // e.g. "welcome/laali.jpg" — leave "" for no photo
 const MESSAGE = "Thank you for your kindness, your patience, and for being there for the people around you. I do not say it often enough, so I am saying it now: I am grateful for you.";
 const FROM = "With love and thanks, from me";
+// Lines revealed by the games (one per caught heart / scratch card). Add as many as you like.
+const LINES = [
+  "Thank you for always listening.",
+  "Thank you for your patience with me.",
+  "Thank you for the laughs on the hard days.",
+  "Thank you for believing in me.",
+  "Thank you for your kindness to everyone around you.",
+  "Thank you for simply being you.",
+];
+const SECRET = "You mean more to me than I can say. Thank you, Laali.";
 // Notes are posted silently to ntfy.sh (free relay, no account needed). Read them at https://ntfy.sh/<NOTE_TOPIC>
 // (kept there for about 12 hours), or subscribe to that topic in the ntfy app on your phone.
 const NOTE_TOPIC = "rudrakshi-gift-8162d6ad";  // same secret topic as before, so an existing ntfy subscription keeps working
@@ -184,6 +255,70 @@ function resetNoteForm(){
 }
 $('noteanother').addEventListener('click',()=>{ resetNoteForm(); $('notetext').focus(); });
 $('again').addEventListener('click',()=>{ resetNoteForm(); window.scrollTo({top:0}); burst(1); hearts(10); });
+
+// ── Games ──
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+ document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x===t));
+ document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('show',p.id===t.dataset.p));
+ if(t.dataset.p==='p2') setTimeout(newCard,50);
+}));
+
+// 1 · catch the hearts
+let caught=0, spawn=null, lineIdx=0;
+function spawnHeart(){
+ const h=document.createElement('button'); h.className='fly'; h.type='button'; h.textContent=Math.random()<.5?'♥':'♡'; h.setAttribute('aria-label','heart');
+ h.style.left=(5+Math.random()*85)+'%'; h.style.setProperty('--s',(22+Math.random()*22)+'px'); h.style.setProperty('--t',(3.2+Math.random()*2.5)+'s');
+ const catchIt=e=>{ if(h.classList.contains('pop')) return; e.preventDefault(); h.classList.add('pop'); caught++;
+  $('score').textContent=caught+' caught'; $('line1').textContent=LINES[lineIdx++%LINES.length]; burst(.25);
+  if(caught%LINES.length===0){ $('line1').textContent='That is all of them — and still not enough. 💛'; } };
+ h.addEventListener('pointerdown',catchIt);
+ $('sky').appendChild(h); setTimeout(()=>h.remove(),6000);
+}
+$('startCatch').addEventListener('click',()=>{
+ if(spawn){ clearInterval(spawn); spawn=null; $('startCatch').textContent='Start'; return; }
+ caught=0; lineIdx=0; $('score').textContent='0 caught'; $('line1').textContent=''; $('sky').innerHTML='';
+ spawnHeart(); spawn=setInterval(spawnHeart,700); $('startCatch').textContent='Stop';
+});
+
+// 2 · scratch card
+const scv=$('scratchcv'), sctx=scv.getContext('2d'); let scratching=false, revealed=false, cardIdx=0;
+function newCard(){
+ const box=$('scratch'), r=box.getBoundingClientRect(); if(!r.width) return;
+ scv.width=Math.round(r.width*devicePixelRatio); scv.height=Math.round(r.height*devicePixelRatio); sctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+ scv.style.opacity=1; revealed=false;
+ $('under').textContent=cardIdx===0?SECRET:LINES[(cardIdx-1)%LINES.length]; cardIdx++;
+ sctx.globalCompositeOperation='source-over';
+ const g=sctx.createLinearGradient(0,0,r.width,r.height); g.addColorStop(0,'#E7C27A'); g.addColorStop(.5,'#D4A24C'); g.addColorStop(1,'#B8873A');
+ sctx.fillStyle=g; sctx.fillRect(0,0,r.width,r.height);
+ sctx.fillStyle='rgba(255,255,255,.85)'; sctx.font='700 18px '+getComputedStyle(document.body).fontFamily; sctx.textAlign='center'; sctx.fillText('scratch here ✦',r.width/2,r.height/2+6);
+ sctx.globalCompositeOperation='destination-out'; sctx.lineWidth=34; sctx.lineCap='round'; sctx.lineJoin='round';
+}
+function scratchAt(e){ const r=scv.getBoundingClientRect(); const x=e.clientX-r.left,y=e.clientY-r.top; sctx.lineTo(x,y); sctx.stroke(); sctx.beginPath(); sctx.moveTo(x,y); }
+function checkReveal(){
+ if(revealed) return; const r=scv.getBoundingClientRect(); const d=sctx.getImageData(0,0,scv.width,scv.height).data; let clear=0;
+ for(let i=3;i<d.length;i+=4*16) if(d[i]===0) clear++;
+ if(clear/(d.length/(4*16))>.45){ revealed=true; scv.style.transition='opacity .6s'; scv.style.opacity=0; burst(.8); hearts(10); }
+}
+scv.addEventListener('pointerdown',e=>{scratching=true;scv.setPointerCapture(e.pointerId);sctx.beginPath();scratchAt(e)});
+scv.addEventListener('pointermove',e=>{ if(scratching){scratchAt(e)} });
+['pointerup','pointercancel','pointerleave'].forEach(ev=>scv.addEventListener(ev,()=>{ if(scratching){scratching=false;checkReveal()} }));
+$('newCard').addEventListener('click',newCard);
+
+// 3 · love meter (hold to fill; it never stops at 100)
+let holding=false, level=0, meterRaf=null;
+const METER_LINES=[[0,'Hold…'],[25,'Getting warmer…'],[50,'Halfway there…'],[75,'Almost…'],[100,'100% — and still counting'],[150,'It does not stop at 100.'],[250,'More than this heart can hold. 💛']];
+function meterTick(){
+ level+= holding? 1.6 : -3; if(level<0) level=0; if(level>999) level=999;
+ const shown=Math.min(level,100); $('fillrect').setAttribute('y',24-24*shown/100); $('fillrect').setAttribute('height',24*shown/100);
+ $('pct').textContent=Math.round(level)+'%';
+ let txt='Hold…'; for(const [v,t] of METER_LINES) if(level>=v) txt=t; $('line3').textContent=txt;
+ $('meter').classList.toggle('full',level>=100);
+ if(holding||level>0) meterRaf=requestAnimationFrame(meterTick); else meterRaf=null;
+}
+const startHold=e=>{e.preventDefault();holding=true;if(!meterRaf)meterRaf=requestAnimationFrame(meterTick)};
+const endHold=()=>{holding=false};
+$('meter').addEventListener('pointerdown',startHold); ['pointerup','pointercancel','pointerleave'].forEach(ev=>$('meter').addEventListener(ev,endHold));
+$('meter').addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){startHold(e)}}); $('meter').addEventListener('keyup',endHold); $('meter').tabIndex=0;
 
 // ── Floating hearts ──
 function hearts(n){

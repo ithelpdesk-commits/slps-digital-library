@@ -1,6 +1,6 @@
 # Silverline Prestige School – web pages
 
-- `index.html` — **Birthday surprise for Rudrakshi (28 Oct 2026).** Tap the gift box and it opens to a greeting, confetti and a cake whose candles can be blown out. Name, date, message and photo are in the `EDIT HERE` block at the bottom of the file.
+- `index.html` — **Thank-you page for Laali.** Tap the 3-D gift box and it opens to a thank-you message, confetti and hearts, with a "Write back to me" note box; notes are posted silently to a private ntfy.sh topic (see the `EDIT HERE` block at the bottom of the file for name, message, photo and topic).
 - `library.html` — the Digital Library page (details below).
 
 Searchable library page for the SLPS website. Open `library.html`, or enable GitHub Pages to publish it.

@@ -3,13 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="A birthday surprise for Rudrakshi">
-<title>For Rudrakshi</title>
+<meta name="description" content="A thank-you note for Laali">
+<title>Thank you, Laali</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Nunito:wght@400;600;700&display=swap">
 <style>
-/* ── Settings the family can edit are in the script at the bottom (name, date, message, photo). ── */
 :root{
-  --bg:#FFF4ED; --box:#FFF1D6; --gold:#D4A24C; --text:#392719; --accent:#D4A24C; --peach:#FFE3D0; --rosegold:#C98A6B; --white:#ffffff;
+  --bg:#FFF4ED; --box:#FFF1D6; --gold:#D4A24C; --text:#392719; --accent:#D4A24C; --peach:#FFE3D0; --rosegold:#C98A6B; --white:#ffffff; --ink:#2A1A0E;
   --display:'Fraunces',Georgia,serif; --body:'Nunito','Segoe UI',system-ui,sans-serif;
 }
 *{box-sizing:border-box}
@@ -21,8 +20,6 @@ body{margin:0;font-family:var(--body);color:var(--text);background:radial-gradie
 @media (prefers-reduced-motion:no-preference){.stickers img{animation:bob var(--d,6s) ease-in-out infinite alternate}}
 @keyframes bob{from{transform:rotate(var(--r,0deg)) translateY(0)}to{transform:rotate(calc(var(--r,0deg) + 3deg)) translateY(-10px)}}
 canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
-
-/* stars */
 .stars{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:
  radial-gradient(3px 3px at 12% 18%,#D4A24C 50%,transparent 51%),radial-gradient(2px 2px at 28% 62%,#C98A6B 50%,transparent 51%),
  radial-gradient(4px 4px at 44% 30%,#F3D9A4 50%,transparent 51%),radial-gradient(2px 2px at 58% 74%,#D4A24C 50%,transparent 51%),
@@ -32,25 +29,12 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
 
 main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px 48px;text-align:center}
 
-/* ── Stage 1: the sealed gift ── */
-.gift{display:none;flex-direction:column;align-items:center;gap:22px;max-width:520px}
-.gift.show{display:flex}
-/* ── Stage 0: the apology ── */
-.sorry{display:flex;flex-direction:column;align-items:center;gap:18px;max-width:560px;min-height:60vh;justify-content:center}
-.sorry .face{position:static;width:150px;height:auto;background:none;border:0;filter:drop-shadow(0 8px 16px rgba(57,39,25,.2))}
-@media (prefers-reduced-motion:no-preference){.sorry .face{animation:peek 2.4s ease-in-out infinite}}
-@keyframes peek{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}
-.sorry h1{font-family:var(--display);font-weight:700;font-size:clamp(34px,7vw,56px);line-height:1.05;margin:0;font-variation-settings:'opsz' 144;color:#2A1A0E;text-shadow:0 1px 0 #fff,0 0 12px rgba(255,255,255,.9)}
-.sorry p{font-size:clamp(17px,2.4vw,20px);line-height:1.6;margin:0;max-width:40ch;color:#2A1A0E;font-weight:700;text-shadow:0 1px 0 #fff,0 0 10px rgba(255,255,255,.9)}
-.sorry p em,.sorry .ask{color:#7A4A1E;font-weight:700}
-.sorry .ask{font-family:var(--display);font-style:italic;color:#7A4A1E;font-weight:700;font-size:26px;margin-top:6px}
-.choices{position:relative;display:flex;gap:14px;justify-content:center;margin-top:8px;min-height:52px}
-.btn.no{background:#fff;color:var(--text);border:1.5px solid rgba(57,39,25,.3);box-shadow:none;transition:transform .25s cubic-bezier(.3,1.3,.5,1)}
-.btn.no.loose{position:fixed;z-index:40;margin:0}
-.btn.yes{transition:transform .2s}
-.sorry[hidden]{display:none}
-.gift h1{font-family:var(--display);font-weight:500;font-size:clamp(28px,6vw,44px);line-height:1.1;margin:0;font-variation-settings:'opsz' 144}
+/* ── Stage 1: the closed gift ── */
+.gift{display:flex;flex-direction:column;align-items:center;gap:22px;max-width:520px}
+.gift h1{font-family:var(--display);font-weight:500;font-size:clamp(28px,6vw,44px);line-height:1.1;margin:0;font-variation-settings:'opsz' 144;color:var(--ink)}
 .gift h1 em{font-style:italic;color:var(--accent)}
+.hint{font-size:15px;color:var(--ink);opacity:.8;margin:0}
+
 /* ── 3-D gift box (CSS transforms, no images) ── */
 .box{position:relative;width:240px;height:230px;cursor:pointer;background:none;border:0;padding:0;outline-offset:8px;perspective:900px}
 .box:focus-visible{outline:3px solid var(--accent);border-radius:12px}
@@ -62,12 +46,10 @@ main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:co
 .face.right{width:var(--d);transform:rotateY(90deg) translateZ(calc(var(--w)/2));background:#F8E8C6}
 .face.bottom{height:var(--d);top:calc((var(--h) - var(--d))/2);transform:rotateX(-90deg) translateZ(calc(var(--h)/2));background:#E4CC9C}
 .face.top{height:var(--d);top:calc((var(--h) - var(--d))/2);transform:rotateX(90deg) translateZ(calc(var(--h)/2));background:#FFF8E6}
-/* vertical ribbon on the side faces, cross ribbon on top */
 .face.front::after,.face.back::after,.face.left::after,.face.right::after{content:"";position:absolute;top:0;bottom:0;left:50%;width:24px;transform:translateX(-50%);background:var(--gold)}
 .face.top::before,.face.top::after{content:"";position:absolute;background:var(--gold)}
 .face.top::before{top:0;bottom:0;left:50%;width:24px;transform:translateX(-50%)}
 .face.top::after{left:0;right:0;top:50%;height:24px;transform:translateY(-50%)}
-/* the lid: a shallow box sitting on top */
 .lid3{position:absolute;left:50%;bottom:calc(var(--h) - 2px);width:var(--lw);height:var(--lh);margin-left:calc(var(--lw)/-2);transform-style:preserve-3d;--lw:142px;--lh:28px;--ld:142px;transform-origin:50% 100% calc(var(--ld)/-2);transition:transform .9s cubic-bezier(.2,.9,.3,1),opacity .6s ease .4s}
 .lid3 .face{width:var(--lw);height:var(--lh);background:#FFF8E6}
 .lid3 .face.front{transform:translateZ(calc(var(--ld)/2))}
@@ -81,56 +63,40 @@ main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:co
 .bow::before{left:0;transform:rotate(-35deg)}.bow::after{right:0;transform:rotate(55deg)}
 .bow i{position:absolute;left:50%;top:22px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:#B8873A}
 .box.open .lid3{transform:rotateX(-115deg) translateY(-60px) translateZ(-30px);opacity:0}
-/* inside of the box glows when open */
 .glowin{position:absolute;left:0;top:calc((var(--h) - var(--d))/2);width:var(--w);height:var(--d);transform:rotateX(90deg) translateZ(calc(var(--h)/2 - 2px));background:radial-gradient(circle,#FFE9B5,#F3D9A4 60%,#E4CC9C);opacity:0;transition:opacity .5s ease .3s}
 .box.open .glowin{opacity:1;box-shadow:0 0 50px 20px rgba(255,220,150,.9)}
 @media (prefers-reduced-motion:no-preference){.box:hover:not(.open) .scene,.box:focus-visible:not(.open) .scene{animation:shake .5s ease-in-out infinite}.box.open::before{content:"";position:absolute;inset:-30px;border-radius:50%;background:radial-gradient(circle,rgba(255,235,180,.95) 0%,rgba(212,162,76,.35) 40%,transparent 70%);animation:glow 1.6s ease-out forwards;pointer-events:none}}
 @keyframes shake{0%,100%{transform:rotateX(-24deg) rotateY(-30deg) rotateZ(0)}25%{transform:rotateX(-24deg) rotateY(-34deg) rotateZ(-3deg) translateX(-3px)}75%{transform:rotateX(-24deg) rotateY(-26deg) rotateZ(3deg) translateX(3px)}}
 @keyframes glow{from{transform:scale(.4);opacity:0}25%{opacity:1}70%{opacity:.8}to{transform:scale(1.7);opacity:0}}
-.hint{font-size:15px;opacity:.75;margin:0}
 
-/* ── Stage 2: the reveal ── */
-.reveal{display:none;flex-direction:column;align-items:center;gap:26px;max-width:640px;width:100%}
+/* ── Stage 2: the thank-you ── */
+.reveal{display:none;flex-direction:column;align-items:center;gap:22px;max-width:640px;width:100%}
 .reveal.show{display:flex}
-.reveal h1{font-family:var(--display);font-weight:700;font-size:clamp(40px,10vw,84px);line-height:.95;margin:0;font-variation-settings:'opsz' 144;letter-spacing:-.01em}
+.reveal h1{font-family:var(--display);font-weight:700;font-size:clamp(40px,10vw,84px);line-height:.95;margin:0;font-variation-settings:'opsz' 144;letter-spacing:-.01em;color:var(--ink)}
 .reveal h1 small{display:block;font-weight:500;font-style:italic;font-size:.42em;color:var(--accent);letter-spacing:0;margin-bottom:10px}
+.heart-mark{width:56px;height:56px}
+@media (prefers-reduced-motion:no-preference){.heart-mark{animation:beat 1.8s ease-in-out infinite}}
+@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.14)}30%{transform:scale(1)}}
 .photo{width:min(72vw,280px);aspect-ratio:3/4;border-radius:16px 16px 60px 16px;object-fit:cover;border:6px solid var(--white);box-shadow:0 20px 50px rgba(57,39,25,.2);transform:rotate(-3deg)}
 .photo[hidden]{display:none}
-.msg{font-size:clamp(17px,2.4vw,20px);line-height:1.6;max-width:46ch;margin:0;color:var(--text)}
-.msg strong{color:var(--accent);font-weight:700}
-
-/* cake */
-.cake{position:relative;width:240px;height:200px;margin-top:6px}
-.cake .plate{position:absolute;left:0;right:0;bottom:0;height:16px;border-radius:50%;background:rgba(57,39,25,.12)}
-.cake .tier{position:absolute;left:50%;transform:translateX(-50%);border-radius:10px 10px 4px 4px;background:linear-gradient(#F3D9A4,var(--gold))}
-.cake .t1{bottom:10px;width:220px;height:62px}.cake .t2{bottom:70px;width:170px;height:54px}
-.cake .tier::before{content:"";position:absolute;left:0;right:0;top:0;height:20px;border-radius:10px 10px 50% 50%/10px 10px 100% 100%;background:var(--white)}
-.candles{position:absolute;left:50%;transform:translateX(-50%);bottom:122px;display:flex;gap:16px}
-.candle{position:relative;width:12px;height:38px;border-radius:3px;background:repeating-linear-gradient(135deg,#fff 0 6px,var(--rosegold) 6px 12px)}
-.flame{position:absolute;left:50%;top:-20px;width:14px;height:22px;transform:translateX(-50%);border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:radial-gradient(circle at 50% 70%,#fff8 0,#FCD34D 35%,#F97316 70%,transparent 72%);filter:drop-shadow(0 0 8px #FBBF24);transform-origin:50% 100%}
-@media (prefers-reduced-motion:no-preference){.flame{animation:flicker .6s ease-in-out infinite alternate}}
-@keyframes flicker{from{transform:translateX(-50%) scale(1,1) rotate(-3deg)}to{transform:translateX(-50%) scale(.9,1.08) rotate(3deg)}}
-.candle.out .flame{animation:none;opacity:0;transition:opacity .25s}
-.candle.out::after{content:"";position:absolute;left:50%;top:-30px;width:6px;height:26px;transform:translateX(-50%);border-radius:50%;background:linear-gradient(#bbb8,transparent);animation:smoke 1.6s ease-out forwards}
-.heart{position:fixed;z-index:6;pointer-events:none;font-size:var(--sz,22px);color:var(--rosegold);animation:float var(--dur,3s) ease-out forwards;opacity:0}
-@keyframes float{0%{transform:translate(0,0) scale(.6);opacity:0}15%{opacity:.95}100%{transform:translate(var(--dx,0),-70vh) rotate(var(--rot,0)) scale(1.1);opacity:0}}
-@keyframes smoke{to{transform:translate(-50%,-30px) scale(1.6);opacity:0}}
+.msg{font-size:clamp(17px,2.4vw,20px);line-height:1.6;max-width:46ch;margin:0;color:var(--ink);font-weight:700;text-shadow:0 1px 0 #fff,0 0 10px rgba(255,255,255,.9)}
+.from{font-family:var(--display);font-style:italic;font-size:20px;color:#7A4A1E;margin:0;font-weight:700}
 
 .btn{font:inherit;font-weight:700;font-size:16px;color:#fff;background:var(--gold);border:0;border-radius:999px;padding:13px 26px;cursor:pointer;box-shadow:0 10px 24px rgba(212,162,76,.35)}
 .btn:focus-visible{outline:3px solid var(--text);outline-offset:3px}
+.btn:disabled{opacity:.6;cursor:default}
 .btn.quiet{background:transparent;color:var(--text);border:1.5px solid rgba(57,39,25,.35);box-shadow:none}
-.wish{font-family:var(--display);font-style:italic;font-size:22px;color:var(--accent);margin:0;min-height:1.4em}
-.from{font-size:14px;opacity:.7;margin:10px 0 0}
-/* gift request, shown after the candles are out */
-.giftform{display:none;flex-direction:column;gap:12px;width:min(100%,440px);background:rgba(255,255,255,.75);border:1px solid rgba(212,162,76,.5);border-radius:16px;padding:20px;text-align:left;backdrop-filter:blur(6px)}
-.giftform.show{display:flex}
-.giftform h3{font-family:var(--display);font-weight:700;font-size:24px;margin:0;color:#2A1A0E}
-.giftform p{margin:0;font-size:15px;color:#2A1A0E}
-.giftform textarea{font:inherit;font-size:16px;padding:12px;border:1.5px solid rgba(57,39,25,.3);border-radius:10px;background:#fff;color:#2A1A0E;min-height:90px;resize:vertical}
-.giftform textarea:focus{outline:2px solid var(--gold);outline-offset:1px}
-.giftform .btn{align-self:flex-start}
-.giftform .sent{font-weight:700;color:#7A4A1E}
-.from a{color:inherit}
+
+.heart{position:fixed;z-index:6;pointer-events:none;font-size:var(--sz,22px);color:var(--rosegold);animation:float var(--dur,3s) ease-out forwards;opacity:0}
+@keyframes float{0%{transform:translate(0,0) scale(.6);opacity:0}15%{opacity:.95}100%{transform:translate(var(--dx,0),-70vh) rotate(var(--rot,0)) scale(1.1);opacity:0}}
+/* note form */
+.noteform{display:flex;flex-direction:column;gap:12px;width:min(100%,440px);background:rgba(255,255,255,.75);border:1px solid rgba(212,162,76,.5);border-radius:16px;padding:20px;text-align:left;backdrop-filter:blur(6px)}
+.noteform h3{font-family:var(--display);font-weight:700;font-size:24px;margin:0;color:var(--ink)}
+.noteform p{margin:0;font-size:15px;color:var(--ink)}
+.noteform textarea{font:inherit;font-size:16px;padding:12px;border:1.5px solid rgba(57,39,25,.3);border-radius:10px;background:#fff;color:var(--ink);min-height:90px;resize:vertical}
+.noteform textarea:focus{outline:2px solid var(--gold);outline-offset:1px}
+.noteform .btn{align-self:flex-start}
+.noteform .sent{font-weight:700;color:#7A4A1E}
 </style>
 </head>
 <body>
@@ -139,22 +105,10 @@ main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:co
 <canvas id="fx" aria-hidden="true"></canvas>
 
 <main>
-  <!-- Stage 0 -->
-  <section class="sorry" id="sorry">
-    <img class="face" src="welcome/pleading.png" alt="" width="150" height="143">
-    <h1>I'm sorry, Rudrakshi.</h1>
-    <p>I know I hurt you, and I truly regret it. Please forgive me — I have something for you.</p>
-    <p class="ask">Will you forgive me?</p>
-    <div class="choices">
-      <button class="btn yes" id="yes" type="button">Yes</button>
-      <button class="btn no" id="no" type="button">No</button>
-    </div>
-  </section>
-
-  <!-- Stage 1 -->
+  <!-- Stage 1: the closed gift -->
   <section class="gift" id="gift">
-    <h1 id="giftTitle">Something is waiting for <em>Rudrakshi</em></h1>
-    <button class="box" id="box" type="button" aria-label="Open your surprise">
+    <h1>A thank-you is waiting for <em>Laali</em></h1>
+    <button class="box" id="box" type="button" aria-label="Open your thank-you">
       <div class="scene">
         <div class="face back"></div><div class="face left"></div><div class="face bottom"></div><div class="glowin"></div>
         <div class="face right"></div><div class="face front"></div>
@@ -166,42 +120,36 @@ main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:co
     <p class="hint" id="hint">Tap the gift to open it</p>
   </section>
 
-  <!-- Stage 2 -->
+  <!-- Stage 2: the thank-you -->
   <section class="reveal" id="reveal" aria-live="polite">
-    <h1><small id="dateLine">28 October</small>Happy Birthday,<br>Rudrakshi!</h1>
+    <h1><small>from my heart</small>Thank you,<br>Laali.</h1>
+    <svg class="heart-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 2.6 5 6.3 5c2.2 0 3.5 1.3 4.7 2.9C12.2 6.3 13.5 5 15.7 5c3.7 0 5.4 3.6 3.9 6.9C19.5 16.4 12 21 12 21z" fill="#D4A24C"/></svg>
     <img class="photo" id="photo" alt="" hidden>
     <p class="msg" id="msg"></p>
-    <div class="cake" aria-hidden="true">
-      <div class="candles" id="candles"></div>
-      <div class="tier t2"></div><div class="tier t1"></div><div class="plate"></div>
-    </div>
-    <p class="wish" id="wish">Make a wish and blow out the candles</p>
-    <button class="btn" id="blow" type="button">Blow out the candles</button>
-    <form class="giftform" id="giftform">
-      <h3>Write a gift you need 🎁</h3>
-      <p>Tell me what you would love, and I will make it happen.</p>
-      <textarea id="giftwish" placeholder="I would love…" required></textarea>
-      <button class="btn" id="giftsend" type="submit">Send my wish</button>
-      <p class="sent" id="giftsent" hidden></p>
-      <button class="btn quiet" id="giftanother" type="button" hidden>Write another wish</button>
-    </form>
-    <button class="btn quiet" id="again" type="button" hidden>Celebrate again</button>
     <p class="from" id="from"></p>
+
+    <form class="noteform" id="noteform">
+      <h3>Write back to me</h3>
+      <p>Tell me anything you want to say.</p>
+      <textarea id="notetext" placeholder="Your note…" required></textarea>
+      <button class="btn" id="notesend" type="submit">Send note</button>
+      <p class="sent" id="notesent" hidden></p>
+      <button class="btn quiet" id="noteanother" type="button" hidden>Write another note</button>
+    </form>
+    <button class="btn quiet" id="again" type="button">Read it again</button>
   </section>
 </main>
 
 <script>
 // ════════════════ EDIT HERE ════════════════
-const NAME = "Rudrakshi";
-const BIRTHDAY = "2026-10-28";                 // YYYY-MM-DD — shown above the greeting
-const AGE = null;                              // e.g. 16 → candles on the cake; null → 5 candles
-const PHOTO = "";                              // e.g. "welcome/rudrakshi.jpg" — leave "" for no photo
-const MESSAGE = "Wishing you a year as bright as you are — full of laughter, new adventures, and every dream coming true. I am so lucky to have you.";
-const FROM = "With love, from me";
-// Where her gift wish goes. It is posted silently to ntfy.sh (free relay, no account needed):
-//   read wishes at  https://ntfy.sh/<GIFT_TOPIC>  (kept there 12 hours), and each one is also e-mailed to GIFT_NOTIFY_EMAIL.
-const GIFT_TOPIC = "rudrakshi-gift-8162d6ad";   // keep this secret — anyone who knows it can read the wishes
-const GIFT_NOTIFY_EMAIL = "";                      // your e-mail address, e.g. "name@gmail.com"
+const NAME = "Laali";
+const PHOTO = "";                              // e.g. "welcome/laali.jpg" — leave "" for no photo
+const MESSAGE = "Thank you for your kindness, your patience, and for being there for the people around you. I do not say it often enough, so I am saying it now: I am grateful for you.";
+const FROM = "With love and thanks, from me";
+// Notes are posted silently to ntfy.sh (free relay, no account needed). Read them at https://ntfy.sh/<NOTE_TOPIC>
+// (kept there for about 12 hours), or subscribe to that topic in the ntfy app on your phone.
+const NOTE_TOPIC = "rudrakshi-gift-8162d6ad";  // same secret topic as before, so an existing ntfy subscription keeps working
+const NOTE_NOTIFY_EMAIL = "";                   // optional: your e-mail address, e.g. "name@gmail.com", to get each note by mail
 // ═══════════════════════════════════════════
 
 const $=id=>document.getElementById(id);
@@ -211,80 +159,54 @@ const $=id=>document.getElementById(id);
  const N=24, files=Array.from({length:N},(_,i)=>'stickers/s'+String(i+1).padStart(2,'0')+'.png');
  for(let i=files.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[files[i],files[j]]=[files[j],files[i]]}
  const host=$('stickers'), vw=innerWidth, vh=innerHeight, mobile=vw<700;
- // one sticker per grid cell, leaving the middle column(s) free for the text and the gift
  const cols=mobile?5:13, rows=mobile?9:8, cw=vw/cols, ch=vh/rows, size=Math.min(mobile?48:72,cw*.9);
- const cells=[]; for(let r=0;r<rows;r++)for(let c=0;c<cols;c++) cells.push([c,r]); // every cell, whole page
- cells.forEach(([c,r],i)=>{
-  const img=document.createElement('img'); img.src=files[i%files.length]; img.alt='';
+ for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+  const img=document.createElement('img'); img.src=files[(r*cols+c)%files.length]; img.alt='';
   const w=size*(.8+Math.random()*.4);
   img.style.left=(c*cw+Math.random()*Math.max(0,cw-w))+'px'; img.style.top=(r*ch+Math.random()*Math.max(0,ch-w))+'px';
   img.style.setProperty('--w',w+'px'); img.style.setProperty('--r',((Math.random()-.5)*34)+'deg'); img.style.setProperty('--d',(5+Math.random()*5)+'s');
   img.style.animationDelay=(-Math.random()*8)+'s';
   host.appendChild(img);
- });
+ }
 })();
 
-// ── Stage 0: Yes / No ──
-const noBtn=$('no'),yesBtn=$('yes');let dodges=0,yesScale=1;
-function dodge(){
- if(!noBtn.classList.contains('loose')){const r=noBtn.getBoundingClientRect();noBtn.classList.add('loose');noBtn.style.left=r.left+'px';noBtn.style.top=r.top+'px';noBtn.style.transform='none'}
- const pad=20,w=noBtn.offsetWidth,h=noBtn.offsetHeight;
- const x=pad+Math.random()*(innerWidth-w-pad*2), y=pad+Math.random()*(innerHeight-h-pad*2);
- noBtn.style.left=x+'px'; noBtn.style.top=y+'px';
- dodges++; yesScale=Math.min(1.9,1+dodges*.12); yesBtn.style.transform='scale('+yesScale+')';
- const lines=['No','Are you sure?','Think again…','Please?','Last chance!','🥺','Just say yes'];
- noBtn.textContent=lines[Math.min(dodges,lines.length-1)];
-}
-noBtn.addEventListener('mouseenter',dodge);
-noBtn.addEventListener('pointerdown',e=>{e.preventDefault();dodge()}); // touch screens: it jumps away on tap
-noBtn.addEventListener('focus',dodge);
-noBtn.addEventListener('click',e=>{e.preventDefault();dodge()});
-yesBtn.addEventListener('click',()=>{ $('sorry').hidden=true; noBtn.remove(); $('gift').classList.add('show'); burst(.6); hearts(16); window.scrollTo({top:0}); });
-const target=new Date(BIRTHDAY+'T00:00:00+05:30');
-$('dateLine').textContent=target.toLocaleDateString('en-IN',{day:'numeric',month:'long'});
+// ── Text and photo ──
 $('msg').textContent=MESSAGE; $('from').textContent=FROM;
 if(PHOTO){$('photo').src=PHOTO;$('photo').hidden=false;$('photo').alt=NAME}
-const nC=AGE?Math.min(AGE,24):5;
-for(let i=0;i<nC;i++){const c=document.createElement('div');c.className='candle';c.innerHTML='<div class="flame"></div>';$('candles').appendChild(c)}
 
-// open the gift
+// ── Open the gift ──
 $('box').addEventListener('click',()=>{
+ if($('box').classList.contains('open')) return;
  $('box').classList.add('open'); $('hint').textContent='';
  burst(.8); hearts(26);
  setTimeout(()=>{ $('gift').style.display='none'; $('reveal').classList.add('show'); window.scrollTo({top:0}); burst(1); hearts(14); },1500);
 });
 
-// candles
-$('blow').addEventListener('click',()=>{
- const cs=[...document.querySelectorAll('.candle')];
- cs.forEach((c,i)=>setTimeout(()=>c.classList.add('out'),i*140));
- setTimeout(()=>{ $('wish').textContent='Your wish is on its way 💫'; burst(1.5); $('blow').hidden=true; $('giftform').classList.add('show'); $('giftwish').focus(); },cs.length*140+300);
-});
-$('giftform').addEventListener('submit',async e=>{
+// ── Note form: posts to ntfy so it reaches you without her leaving the page ──
+$('noteform').addEventListener('submit',async e=>{
  e.preventDefault();
- const wish=$('giftwish').value.trim(); if(!wish) return;
- $('giftsend').disabled=true; $('giftsend').textContent='Sending…';
- const headers={'Title':'Gift wish from '+NAME,'Tags':'gift','Priority':'high'};
- if(GIFT_NOTIFY_EMAIL) headers['Email']=GIFT_NOTIFY_EMAIL;
+ const note=$('notetext').value.trim(); if(!note) return;
+ $('notesend').disabled=true; $('notesend').textContent='Sending…';
+ const headers={'Title':'Note from '+NAME,'Tags':'heart','Priority':'high'};
+ if(NOTE_NOTIFY_EMAIL) headers['Email']=NOTE_NOTIFY_EMAIL;
  let ok=false;
- try{ const r=await fetch('https://ntfy.sh/'+GIFT_TOPIC,{method:'POST',headers,body:wish+'\n— '+NAME+', '+new Date().toLocaleString('en-IN')}); ok=r.ok; }catch(err){}
- if(!ok){ // keep it on this device so it is not lost; she can try again
-  try{ localStorage.setItem('gift-wish-pending',wish) }catch(err){}
-  $('giftsend').disabled=false; $('giftsend').textContent='Send my wish';
-  $('giftsent').textContent='Could not send just now — please check the internet and tap Send again.'; $('giftsent').hidden=false; return;
+ try{ const r=await fetch('https://ntfy.sh/'+NOTE_TOPIC,{method:'POST',headers,body:note+'\n— '+NAME+', '+new Date().toLocaleString('en-IN')}); ok=r.ok; }catch(err){}
+ if(!ok){
+  $('notesend').disabled=false; $('notesend').textContent='Send note';
+  $('notesent').textContent='Could not send just now — please check the internet and tap Send again.'; $('notesent').hidden=false; return;
  }
- try{ localStorage.removeItem('gift-wish-pending') }catch(err){}
- $('giftsent').textContent='Got it! Your wish is on its way to me 💛'; $('giftsent').hidden=false; $('giftsend').hidden=true; $('giftwish').readOnly=true; $('giftanother').hidden=false;
- $('again').hidden=false; burst(1); hearts(12);
+ $('notesent').textContent='Thank you, your note has been sent 💛'; $('notesent').hidden=false;
+ $('notesend').hidden=true; $('notetext').readOnly=true; $('noteanother').hidden=false;
+ burst(1); hearts(12);
 });
-function resetGiftForm(){ $('giftwish').value=''; $('giftwish').readOnly=false; $('giftsent').hidden=true; $('giftsend').hidden=false; $('giftsend').disabled=false; $('giftsend').textContent='Send my wish'; $('giftanother').hidden=true; }
-$('giftanother').addEventListener('click',()=>{ resetGiftForm(); $('giftwish').focus(); });
-$('again').addEventListener('click',()=>{ resetGiftForm();
- document.querySelectorAll('.candle').forEach(c=>c.classList.remove('out'));
- $('wish').textContent='Make a wish and blow out the candles'; $('blow').hidden=false; $('again').hidden=true; $('giftform').classList.remove('show'); burst(1);
-});
+function resetNoteForm(){
+ $('notetext').value=''; $('notetext').readOnly=false; $('notesent').hidden=true;
+ $('notesend').hidden=false; $('notesend').disabled=false; $('notesend').textContent='Send note'; $('noteanother').hidden=true;
+}
+$('noteanother').addEventListener('click',()=>{ resetNoteForm(); $('notetext').focus(); });
+$('again').addEventListener('click',()=>{ resetNoteForm(); window.scrollTo({top:0}); burst(1); hearts(10); });
 
-// floating hearts
+// ── Floating hearts ──
 function hearts(n){
  if(matchMedia('(prefers-reduced-motion:reduce)').matches) return;
  const r=$('box').getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2;
@@ -295,7 +217,8 @@ function hearts(n){
   h.style.animationDelay=(Math.random()*.6)+'s';h.style.color=i%4?'var(--rosegold)':'var(--gold)';
   document.body.appendChild(h);setTimeout(()=>h.remove(),4800)}
 }
-// confetti (no library)
+
+// ── Confetti (no library) ──
 const cv=$('fx'),ctx=cv.getContext('2d');let parts=[],raf=null;
 function size(){cv.width=innerWidth*devicePixelRatio;cv.height=innerHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
 size();addEventListener('resize',size);

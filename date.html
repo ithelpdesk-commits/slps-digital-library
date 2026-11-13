@@ -1,0 +1,340 @@
+<!doctype html>
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Date Question</title>
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap");
+/* Layout: one centred card on a soft pink field, with the buttons as the only interactive moment. */
+:root {
+  --bg: #FFF0F5;
+  --bg2: #FFD9E6;
+  --card: #FFF8FB;
+  --fg: #4A1F33;
+  --muted: #8A4A67;
+  --accent: #E0457B;
+  --accent-ink: #FFFFFF;
+  --soft: #FFC2D6;
+  --line: #F5B3CB;
+  --display: "Fraunces", Georgia, "Times New Roman", serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #2A0F1C; --bg2: #3D1528; --card: #351529; --fg: #FFE4EE; --muted: #F0A8C4;
+    --accent: #F0628F; --accent-ink: #2A0F1C; --soft: #6B2A4A; --line: #6B2A4A; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #2A0F1C; --bg2: #3D1528; --card: #351529; --fg: #FFE4EE; --muted: #F0A8C4;
+  --accent: #F0628F; --accent-ink: #2A0F1C; --soft: #6B2A4A; --line: #6B2A4A; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background: radial-gradient(ellipse at 50% 0%, var(--bg2) 0%, var(--bg) 60%) fixed, var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px;
+  overflow-x: hidden;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+main { width: 100%; max-width: 460px; }
+
+.card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  padding: 36px 24px 28px;
+  text-align: center;
+  box-shadow: 0 18px 50px -24px rgba(224, 69, 123, .45);
+  overflow: hidden;
+  min-height: 420px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.eyebrow {
+  font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--accent); margin: 0 0 12px;
+}
+h1 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(30px, 8vw, 40px);
+  line-height: 1.08;
+  margin: 0 0 10px;
+  text-wrap: balance;
+}
+h1 em { font-style: italic; color: var(--accent); font-weight: 600; }
+.sub { margin: 0 0 28px; color: var(--muted); font-size: 16px; line-height: 1.5; max-width: 32ch; }
+
+.heart {
+  font-size: 46px; line-height: 1; margin-bottom: 14px;
+  animation: beat 1.4s ease-in-out infinite;
+}
+@keyframes beat { 0%,100% { transform: scale(1); } 15% { transform: scale(1.12); } 30% { transform: scale(1); } 45% { transform: scale(1.08); } }
+
+.choices {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  display: flex; justify-content: center; align-items: center; gap: 14px;
+}
+button {
+  font: inherit;
+  font-weight: 600;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  padding: 14px 32px;
+  font-size: 17px;
+  transition: transform .2s ease, background .2s ease;
+}
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+#yes {
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: 0 10px 24px -10px var(--accent);
+  transform: scale(1);
+}
+#yes:hover { transform: scale(1.06); }
+#no {
+  background: transparent;
+  color: var(--muted);
+  border: 1.5px solid var(--line);
+  position: relative;
+  transition: left .25s ease, top .25s ease, transform .2s ease;
+}
+#no.run { position: fixed; z-index: 5; }
+.yes-grow { transform: scale(1.18) !important; }
+
+.stage { width: 100%; }
+[hidden] { display: none !important; }
+
+.date-wrap {
+  width: 100%;
+  display: flex; flex-direction: column; gap: 14px; align-items: center;
+}
+label { font-size: 14px; color: var(--muted); font-weight: 600; }
+input[type="text"], input[type="date"] {
+  font: inherit;
+  font-size: 17px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1.5px solid var(--line);
+  background: var(--bg);
+  color: var(--fg);
+  max-width: 100%;
+  color-scheme: inherit;
+}
+input[type="text"]:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.done-date {
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 6px 0 0;
+}
+.status { min-height: 1.4em; font-size: 14px; color: var(--muted); margin: 0; }
+
+.burst {
+  position: absolute; width: 10px; height: 10px; border-radius: 50%;
+  pointer-events: none; animation: fly 1.1s ease-out forwards;
+}
+@keyframes fly {
+  to { transform: translate(var(--x), var(--y)) scale(.4); opacity: 0; }
+}
+.float {
+  position: absolute; bottom: -30px; font-size: 22px; pointer-events: none;
+  animation: rise 2.6s ease-in forwards;
+}
+@keyframes rise {
+  to { transform: translateY(-460px) rotate(20deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .heart, .burst, .float { animation: none; }
+}
+</style>
+
+<main>
+  <section class="card" id="ask">
+    <div class="heart" aria-hidden="true">💗</div>
+    <p class="eyebrow">One small question</p>
+    <h1>Palak, will you go on a <em>date</em> with me?</h1>
+    <p class="sub">Think about it. There is only one answer I am hoping for.</p>
+
+    <div class="choices" id="choices">
+      <button id="yes" type="button">Yes</button>
+      <button id="no" type="button">No</button>
+    </div>
+    <p class="status" id="nudge" aria-live="polite"></p>
+  </section>
+
+  <section class="card" id="yesPanel" hidden>
+    <div class="heart" aria-hidden="true">💖</div>
+    <p class="eyebrow">Yay!</p>
+    <h1>Pick the <em>day</em> and <em>place</em></h1>
+    <p class="sub">When and where should we go?</p>
+
+    <form class="date-wrap" id="dateForm" novalidate>
+      <label for="day">Day</label>
+      <input type="date" id="day" name="day" required>
+      <label for="when">Place</label>
+      <input type="text" id="when" name="when" placeholder="Type a place" maxlength="80" required>
+      <button class="primary" id="confirm" type="submit">Lock it in</button>
+      <p class="status" id="dateStatus" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <section class="card" id="donePanel" hidden>
+    <div class="heart" aria-hidden="true">🥰</div>
+    <p class="eyebrow">It is a date</p>
+    <h1>See you <em>then</em></h1>
+    <p class="done-date" id="chosen"></p>
+    <p class="sub">I will be smiling the whole time.</p>
+    <button id="again" type="button" class="primary">Change the day</button>
+  </section>
+</main>
+
+<script>
+(function () {
+  var ask = document.getElementById('ask');
+  var yesPanel = document.getElementById('yesPanel');
+  var donePanel = document.getElementById('donePanel');
+  var yes = document.getElementById('yes');
+  var no = document.getElementById('no');
+  var choices = document.getElementById('choices');
+  var nudge = document.getElementById('nudge');
+  var dateForm = document.getElementById('dateForm');
+  var when = document.getElementById('when');
+  var dateStatus = document.getElementById('dateStatus');
+  var chosen = document.getElementById('chosen');
+  var again = document.getElementById('again');
+
+  var noLines = [
+    'No?',
+    'Are you sure?',
+    'Think again 🥺',
+    'Please say yes',
+    'Last chance!',
+    'That button is shy...'
+  ];
+  var noCount = 0;
+  var yesScale = 1;
+
+  function rand(min, max) { return min + Math.random() * (max - min); }
+
+  // Move the No button somewhere else inside the card, away from the pointer.
+  function runAway() {
+    var card = ask.getBoundingClientRect();
+    var b = no.getBoundingClientRect();
+    var maxX = Math.max(0, card.width - b.width - 24);
+    var maxY = Math.max(0, card.height - b.height - 24);
+    var x = card.left + rand(12, maxX + 12);
+    var y = card.top + rand(12, maxY + 12);
+    no.classList.add('run');
+    no.style.left = x + 'px';
+    no.style.top = y + 'px';
+  }
+
+  function onNoTry(e) {
+    if (e && e.cancelable) e.preventDefault();
+    noCount++;
+    nudge.textContent = noLines[Math.min(noCount - 1, noLines.length - 1)];
+    yesScale = Math.min(yesScale + 0.12, 1.9);
+    yes.style.transform = 'scale(' + yesScale + ')';
+    runAway();
+  }
+
+  // Desktop: run when the pointer comes near. Touch: run on tap.
+  no.addEventListener('pointerenter', onNoTry);
+  no.addEventListener('touchstart', onNoTry, { passive: false });
+  no.addEventListener('click', onNoTry);
+
+  yes.addEventListener('click', function () {
+    ask.hidden = true;
+    yesPanel.hidden = false;
+    burst(yes);
+    when.focus();
+  });
+
+  dateForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    dateStatus.textContent = '';
+    var day = document.getElementById('day');
+    if (!day.value) {
+      dateStatus.textContent = 'Please pick a day first.';
+      day.focus();
+      return;
+    }
+    if (!when.value.trim()) {
+      dateStatus.textContent = 'Please type a place first.';
+      when.focus();
+      return;
+    }
+    var d = new Date(day.value + 'T00:00:00');
+    chosen.textContent = d.toLocaleDateString(undefined, {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    }) + ' at ' + when.value.trim();
+    fetch('https://ntfy.sh/rudrakshi-gift-8162d6ad', {
+      method: 'POST',
+      headers: { 'Title': 'Date question answered', 'Tags': 'heart' },
+      body: 'Yes! Date: ' + chosen.textContent
+    }).catch(function () {});
+    yesPanel.hidden = true;
+    donePanel.hidden = false;
+    burst(donePanel);
+    floatHearts(donePanel, 14);
+  });
+
+  again.addEventListener('click', function () {
+    donePanel.hidden = true;
+    yesPanel.hidden = false;
+    when.focus();
+  });
+
+  function burst(el) {
+    var colors = ['#E0457B', '#FFC2D6', '#F08BAE', '#FFD700', '#ffffff'];
+    var r = el.getBoundingClientRect();
+    var cx = r.left + r.width / 2;
+    var cy = r.top + r.height / 2;
+    for (var i = 0; i < 26; i++) {
+      var p = document.createElement('span');
+      p.className = 'burst';
+      p.style.background = colors[i % colors.length];
+      p.style.left = cx + 'px';
+      p.style.top = cy + 'px';
+      var ang = (Math.PI * 2 * i) / 26;
+      var dist = rand(90, 170);
+      p.style.setProperty('--x', Math.cos(ang) * dist + 'px');
+      p.style.setProperty('--y', Math.sin(ang) * dist + 'px');
+      p.style.position = 'fixed';
+      document.body.appendChild(p);
+      setTimeout(removeNode(p), 1200);
+    }
+  }
+
+  function floatHearts(el, n) {
+    for (var i = 0; i < n; i++) {
+      var h = document.createElement('span');
+      h.className = 'float';
+      h.textContent = i % 2 ? '💗' : '🌸';
+      h.style.left = rand(8, 92) + '%';
+      h.style.animationDelay = rand(0, 1.2) + 's';
+      el.appendChild(h);
+      setTimeout(removeNode(h), 4200);
+    }
+  }
+
+  function removeNode(n) {
+    return function () { if (n.parentNode) n.parentNode.removeChild(n); };
+  }
+})();
+</script>

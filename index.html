@@ -129,6 +129,19 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 .pick .sub { font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
 .pick .price { font-weight: 700; color: var(--accent); white-space: nowrap; }
 
+.rec {
+  display: grid; gap: 10px;
+  padding: 14px; margin-top: 14px;
+  border: 1.5px solid var(--accent);
+  border-radius: 14px;
+  background: var(--chip);
+  min-width: 0;
+}
+.rec-head { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.rec-line { display: grid; gap: 2px; min-width: 0; }
+.rec-label { font-size: 13px; font-weight: 600; color: var(--muted); }
+.rec-line .title { font-weight: 700; overflow-wrap: anywhere; }
+.rec-line .sub { font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
 .car { display: grid; gap: 10px; }
 .car img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; max-width: 100%; background: var(--chip); }
 .car-empty {
@@ -273,7 +286,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
     { name: 'Innova Crysta' }
   ];
 
-  // Train options. Add one entry per train: no, name, from, to, dep (departure time), fare (number, in rupees).
+  // Train options. Add one entry per train: no, name, from, to, dep (departure time), dur (journey time in minutes), fare (number, in rupees).
   var TRAINS = [];
 
   var VEHICLE_OPTS = ['Cab', 'Personal car', 'Personal bike', 'Other'];
@@ -444,6 +457,26 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
       list.appendChild(nf);
       return;
     }
+    // Recommendation: fastest train, and the cheapest fare (shortest time breaks a tie)
+    var fastest = found.reduce(function (a, b) { return b.dur < a.dur ? b : a; });
+    var cheapest = found.reduce(function (a, b) {
+      if (b.fare !== a.fare) return b.fare < a.fare ? b : a;
+      return b.dur < a.dur ? b : a;
+    });
+    var rec = document.createElement('div');
+    rec.className = 'rec';
+    var h = document.createElement('p');
+    h.className = 'rec-head';
+    h.textContent = 'Our recommendation';
+    rec.appendChild(h);
+    if (fastest === cheapest) {
+      rec.appendChild(recLine('Fastest and most cost-effective', fastest));
+    } else {
+      rec.appendChild(recLine('Fastest', fastest));
+      rec.appendChild(recLine('Most cost-effective', cheapest));
+    }
+    list.appendChild(rec);
+
     found.forEach(function (t) {
       var btn = document.createElement('button');
       btn.type = 'button';
@@ -453,7 +486,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
       title.textContent = t.name + ' (' + t.no + ')';
       var sub = document.createElement('span');
       sub.className = 'sub';
-      sub.textContent = t.from + ' to ' + t.to + ' · departs ' + t.dep;
+      sub.textContent = t.from + ' to ' + t.to + ' · departs ' + t.dep + ' · ' + fmtDur(t.dur);
       var price = document.createElement('span');
       price.className = 'price';
       price.textContent = rupees(t.fare);
@@ -464,6 +497,29 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
       list.appendChild(btn);
     });
   });
+
+  function fmtDur(min) {
+    var h = Math.floor(min / 60), m = min % 60;
+    return (h ? h + 'h ' : '') + (m ? m + 'm' : '').trim();
+  }
+
+  function recLine(label, t) {
+    var wrap = document.createElement('div');
+    wrap.className = 'rec-line';
+    var k = document.createElement('span');
+    k.className = 'rec-label';
+    k.textContent = label;
+    var title = document.createElement('span');
+    title.className = 'title';
+    title.textContent = t.name + ' (' + t.no + ')';
+    var sub = document.createElement('span');
+    sub.className = 'sub';
+    sub.textContent = t.dep + ' departure · ' + fmtDur(t.dur) + ' · ' + rupees(t.fare);
+    wrap.appendChild(k);
+    wrap.appendChild(title);
+    wrap.appendChild(sub);
+    return wrap;
+  }
 
   function chooseTrain(t) {
     state.train = t;

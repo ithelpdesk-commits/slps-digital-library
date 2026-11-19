@@ -1,358 +1,617 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="A thank-you note for Laali">
-<title>Thank you, Laali</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Nunito:wght@400;600;700&display=swap">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ravi Renewables Travel Desk</title>
 <style>
-:root{
-  --bg:#FFF0F5; --box:#FFE4EE; --gold:#E0457B; --text:#4A1F33; --accent:#E0457B; --peach:#FFD9E6; --rosegold:#F08BAE; --white:#ffffff; --ink:#3A1224;
-  --display:'Fraunces',Georgia,serif; --body:'Nunito','Segoe UI',system-ui,sans-serif;
+/* Layout: one narrow column, one step on screen at a time, big tap targets for phones. */
+:root {
+  --bg: #F3F6F2;
+  --card: #FFFFFF;
+  --fg: #14291E;
+  --muted: #5B6B62;
+  --accent: #0F6B4F;
+  --accent-ink: #FFFFFF;
+  --sun: #F2A900;
+  --line: #D5E0D9;
+  --chip: #E6F0EA;
+  --err: #B42318;
+  color-scheme: light;
 }
-*{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;font-family:var(--body);color:var(--text);background:var(--peach);min-height:100vh;overflow-x:hidden}
-canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
-.stars{position:fixed;inset:0;pointer-events:none;z-index:0;background-color:var(--bg);background-image:
- radial-gradient(3px 3px at 12% 18%,#E0457B 50%,transparent 51%),radial-gradient(2px 2px at 28% 62%,#F08BAE 50%,transparent 51%),
- radial-gradient(4px 4px at 44% 30%,#FFC2D6 50%,transparent 51%),radial-gradient(2px 2px at 58% 74%,#E0457B 50%,transparent 51%),
- radial-gradient(3px 3px at 72% 22%,#F08BAE 50%,transparent 51%),radial-gradient(2px 2px at 86% 58%,#FFC2D6 50%,transparent 51%),
- radial-gradient(4px 4px at 92% 12%,#E0457B 50%,transparent 51%),radial-gradient(2px 2px at 8% 84%,#F08BAE 50%,transparent 51%),
- radial-gradient(3px 3px at 36% 92%,#FFC2D6 50%,transparent 51%),radial-gradient(2px 2px at 64% 8%,#E0457B 50%,transparent 51%),radial-gradient(120% 90% at 50% 0%,#ffffff 0%,var(--bg) 45%,var(--peach) 100%);opacity:1}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1B15; --card: #16271F; --fg: #E7F2EC; --muted: #9DB5A8;
+    --accent: #3FBF93; --accent-ink: #0E1B15; --sun: #F2B93B; --line: #2A3F35;
+    --chip: #1F3A2E; --err: #FF8A80; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1B15; --card: #16271F; --fg: #E7F2EC; --muted: #9DB5A8;
+  --accent: #3FBF93; --accent-ink: #0E1B15; --sun: #F2B93B; --line: #2A3F35;
+  --chip: #1F3A2E; --err: #FF8A80; color-scheme: dark;
+}
 
-main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px 48px;text-align:center}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 40px;
+  overflow-x: hidden;
+}
+main { max-width: 520px; margin: 0 auto; display: grid; gap: 16px; }
+[hidden] { display: none !important; }
 
-/* ── Stage 1: the closed gift ── */
-.gift{display:flex;flex-direction:column;align-items:center;gap:22px;max-width:520px}
-.gift h1{font-family:var(--display);font-weight:500;font-size:clamp(28px,6vw,44px);line-height:1.1;margin:0;font-variation-settings:'opsz' 144;color:var(--ink)}
-.gift h1 em{font-style:italic;color:var(--accent)}
-.hint{font-size:15px;color:var(--ink);opacity:.8;margin:0}
+.brand { padding: 8px 4px 0; }
+.kicker { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 4px 0 6px; font-size: clamp(28px, 8vw, 34px); line-height: 1.1; text-wrap: balance; }
+h2 { margin: 0 0 12px; font-size: 22px; line-height: 1.2; text-wrap: balance; }
+.lede, .muted { margin: 0; color: var(--muted); }
 
-/* ── 3-D gift box (CSS transforms, no images) ── */
-.box{position:relative;width:240px;height:230px;cursor:pointer;background:none;border:0;padding:0;outline-offset:8px;perspective:900px}
-.box:focus-visible{outline:3px solid var(--accent);border-radius:12px}
-.scene{position:absolute;left:50%;bottom:16px;width:var(--w);height:var(--h);margin-left:calc(var(--w)/-2);transform-style:preserve-3d;transform:rotateX(-24deg) rotateY(-30deg);--w:130px;--h:104px;--d:130px}
-.face{position:absolute;left:0;top:0;width:var(--w);height:var(--h);background:var(--box);border:1px solid #F2A9C4;backface-visibility:hidden}
-.face.front{transform:translateZ(calc(var(--d)/2))}
-.face.back{transform:rotateY(180deg) translateZ(calc(var(--d)/2))}
-.face.left{width:var(--d);transform:rotateY(-90deg) translateZ(calc(var(--w)/2));background:#F9C4D6}
-.face.right{width:var(--d);transform:rotateY(90deg) translateZ(calc(var(--w)/2));background:#FFD2E1}
-.face.bottom{height:var(--d);top:calc((var(--h) - var(--d))/2);transform:rotateX(-90deg) translateZ(calc(var(--h)/2));background:#F2B4CA}
-.face.top{height:var(--d);top:calc((var(--h) - var(--d))/2);transform:rotateX(90deg) translateZ(calc(var(--h)/2));background:#FFF3F8}
-.face.front::after,.face.back::after,.face.left::after,.face.right::after{content:"";position:absolute;top:0;bottom:0;left:50%;width:24px;transform:translateX(-50%);background:var(--gold)}
-.face.top::before,.face.top::after{content:"";position:absolute;background:var(--gold)}
-.face.top::before{top:0;bottom:0;left:50%;width:24px;transform:translateX(-50%)}
-.face.top::after{left:0;right:0;top:50%;height:24px;transform:translateY(-50%)}
-.lid3{position:absolute;left:50%;bottom:calc(var(--h) - 2px);width:var(--lw);height:var(--lh);margin-left:calc(var(--lw)/-2);transform-style:preserve-3d;--lw:142px;--lh:28px;--ld:142px;transform-origin:50% 100% calc(var(--ld)/-2);transition:transform .9s cubic-bezier(.2,.9,.3,1),opacity .6s ease .4s}
-.lid3 .face{width:var(--lw);height:var(--lh);background:#FFF3F8}
-.lid3 .face.front{transform:translateZ(calc(var(--ld)/2))}
-.lid3 .face.back{transform:rotateY(180deg) translateZ(calc(var(--ld)/2))}
-.lid3 .face.left{width:var(--ld);transform:rotateY(-90deg) translateZ(calc(var(--lw)/2));background:#F9C4D6}
-.lid3 .face.right{width:var(--ld);transform:rotateY(90deg) translateZ(calc(var(--lw)/2));background:#FFD2E1}
-.lid3 .face.top{height:var(--ld);top:calc((var(--lh) - var(--ld))/2);transform:rotateX(90deg) translateZ(calc(var(--lh)/2));background:#FFF8FB}
-.lid3 .face.bottom{display:none}
-.bow{position:absolute;left:50%;top:50%;width:64px;height:40px;transform:translate(-50%,-50%)}
-.bow::before,.bow::after{content:"";position:absolute;top:0;width:30px;height:30px;border:8px solid var(--gold);border-radius:50% 50% 0 50%}
-.bow::before{left:0;transform:rotate(-35deg)}.bow::after{right:0;transform:rotate(55deg)}
-.bow i{position:absolute;left:50%;top:22px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:#C9306A}
-.box.open .lid3{transform:rotateX(-115deg) translateY(-60px) translateZ(-30px);opacity:0}
-.glowin{position:absolute;left:0;top:calc((var(--h) - var(--d))/2);width:var(--w);height:var(--d);transform:rotateX(90deg) translateZ(calc(var(--h)/2 - 2px));background:radial-gradient(circle,#FFE1EC,#FFC2D6 60%,#F2B4CA);opacity:0;transition:opacity .5s ease .3s}
-.box.open .glowin{opacity:1;box-shadow:0 0 50px 20px rgba(255,200,222,.9)}
-@media (prefers-reduced-motion:no-preference){.box:hover:not(.open) .scene,.box:focus-visible:not(.open) .scene{animation:shake .5s ease-in-out infinite}.box.open::before{content:"";position:absolute;inset:-30px;border-radius:50%;background:radial-gradient(circle,rgba(255,214,230,.95) 0%,rgba(224,69,123,.35) 40%,transparent 70%);animation:glow 1.6s ease-out forwards;pointer-events:none}}
-@keyframes shake{0%,100%{transform:rotateX(-24deg) rotateY(-30deg) rotateZ(0)}25%{transform:rotateX(-24deg) rotateY(-34deg) rotateZ(-3deg) translateX(-3px)}75%{transform:rotateX(-24deg) rotateY(-26deg) rotateZ(3deg) translateX(3px)}}
-@keyframes glow{from{transform:scale(.4);opacity:0}25%{opacity:1}70%{opacity:.8}to{transform:scale(1.7);opacity:0}}
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 22px 18px;
+  min-width: 0;
+}
+.crumb { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin: 0 0 12px; font-size: 14px; color: var(--muted); }
+.crumb strong { color: var(--fg); }
 
-/* ── Stage 2: the thank-you ── */
-.reveal{display:none;flex-direction:column;align-items:center;gap:22px;max-width:640px;width:100%}
-.reveal.show{display:flex}
-.reveal h1{font-family:var(--display);font-weight:700;font-size:clamp(40px,10vw,84px);line-height:.95;margin:0;font-variation-settings:'opsz' 144;letter-spacing:-.01em;color:var(--ink)}
-.reveal h1 small{display:block;font-weight:500;font-style:italic;font-size:.42em;color:var(--accent);letter-spacing:0;margin-bottom:10px}
-.heart-mark{width:56px;height:56px}
-@media (prefers-reduced-motion:no-preference){.heart-mark{animation:beat 1.8s ease-in-out infinite}}
-@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.14)}30%{transform:scale(1)}}
-.photo{width:min(72vw,280px);aspect-ratio:3/4;border-radius:16px 16px 60px 16px;object-fit:cover;border:6px solid var(--white);box-shadow:0 20px 50px rgba(74,31,51,.2);transform:rotate(-3deg)}
-.photo[hidden]{display:none}
-.msg{font-size:clamp(17px,2.4vw,20px);line-height:1.6;max-width:46ch;margin:0;color:var(--ink);font-weight:700;text-shadow:0 1px 0 #fff,0 0 10px rgba(255,255,255,.9)}
-.from{font-family:var(--display);font-style:italic;font-size:20px;color:#B3295C;margin:0;font-weight:700}
+label { display: block; font-size: 14px; font-weight: 600; margin: 14px 0 6px; }
+input, select, textarea {
+  width: 100%;
+  font: inherit;
+  font-size: 16px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--fg);
+}
+textarea { min-height: 96px; resize: vertical; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 3px solid var(--sun);
+  outline-offset: 2px;
+}
 
-.btn{font:inherit;font-weight:700;font-size:16px;color:#fff;background:var(--gold);border:0;border-radius:999px;padding:13px 26px;cursor:pointer;box-shadow:0 10px 24px rgba(224,69,123,.35)}
-.btn:focus-visible{outline:3px solid var(--text);outline-offset:3px}
-.btn:disabled{opacity:.6;cursor:default}
-.btn.quiet{background:transparent;color:var(--text);border:1.5px solid rgba(74,31,51,.35);box-shadow:none}
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; margin-top: 18px;
+  font: inherit; font-weight: 700; font-size: 16px;
+  padding: 14px 18px;
+  border: 1.5px solid var(--accent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn.primary { background: var(--accent); color: var(--accent-ink); }
+.btn:disabled { opacity: .6; cursor: default; }
+.link { background: none; border: 0; padding: 0; font: inherit; font-weight: 600; color: var(--accent); cursor: pointer; text-decoration: underline; }
 
-.heart{position:fixed;z-index:6;pointer-events:none;font-size:var(--sz,22px);color:var(--rosegold);animation:float var(--dur,3s) ease-out forwards;opacity:0}
-@keyframes float{0%{transform:translate(0,0) scale(.6);opacity:0}15%{opacity:.95}100%{transform:translate(var(--dx,0),-70vh) rotate(var(--rot,0)) scale(1.1);opacity:0}}
-/* note form */
-.noteform{display:flex;flex-direction:column;gap:12px;width:min(100%,440px);background:rgba(255,255,255,.75);border:1px solid rgba(224,69,123,.5);border-radius:16px;padding:20px;text-align:left;backdrop-filter:blur(6px)}
-.noteform h3{font-family:var(--display);font-weight:700;font-size:24px;margin:0;color:var(--ink)}
-.noteform p{margin:0;font-size:15px;color:var(--ink)}
-.noteform textarea{font:inherit;font-size:16px;padding:12px;border:1.5px solid rgba(74,31,51,.3);border-radius:10px;background:#fff;color:var(--ink);min-height:90px;resize:vertical}
-.noteform textarea:focus{outline:2px solid var(--gold);outline-offset:1px}
-.noteform .btn{align-self:flex-start}
-.noteform .sent{font-weight:700;color:#B3295C}
-/* ── Games ── */
-.games{width:min(100%,520px);display:flex;flex-direction:column;gap:14px;margin-top:8px}
-.games h2{font-family:var(--display);font-weight:700;font-size:30px;margin:0;color:var(--ink)}
-.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.tab{font:inherit;font-weight:700;font-size:14px;padding:9px 16px;border-radius:999px;border:1.5px solid rgba(74,31,51,.3);background:#fff;color:var(--ink);cursor:pointer}
-.tab[aria-selected="true"]{background:var(--gold);color:#fff;border-color:var(--gold)}
-.tab:focus-visible{outline:3px solid var(--text);outline-offset:2px}
-.panel{display:none;flex-direction:column;align-items:center;gap:12px;background:rgba(255,255,255,.75);border:1px solid rgba(224,69,123,.5);border-radius:16px;padding:18px;backdrop-filter:blur(6px)}
-.panel.show{display:flex}
-.panel p{margin:0;color:var(--ink);font-size:15px}
-.panel .line{font-family:var(--display);font-style:italic;font-weight:700;font-size:20px;color:#B3295C;min-height:1.5em;text-align:center}
-/* 1 · catch the hearts */
-.sky{position:relative;width:100%;height:260px;border-radius:12px;background:linear-gradient(#fff5f9,#ffe0eb);overflow:hidden;border:1px solid rgba(224,69,123,.4)}
-.fly{position:absolute;bottom:-40px;font-size:var(--s,30px);color:var(--rosegold);cursor:pointer;user-select:none;background:none;border:0;padding:4px;line-height:1;animation:rise var(--t,5s) linear forwards}
-.fly:nth-child(odd){color:var(--gold)}
-@keyframes rise{to{transform:translateY(-340px) rotate(20deg)}}
-.fly.pop{animation:pop .35s ease-out forwards}
-@keyframes pop{to{transform:scale(2.2);opacity:0}}
-.score{font-weight:700;color:var(--ink)}
-/* 2 · scratch card */
-.scratch{position:relative;width:min(100%,360px);aspect-ratio:16/9;border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(74,31,51,.15);touch-action:none}
-.scratch .under{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;text-align:center;background:#fff;color:var(--ink);font-family:var(--display);font-weight:700;font-size:20px;line-height:1.3}
-.scratch canvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
-/* 3 · love meter */
-.meter{position:relative;width:150px;height:140px;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none}
-.meter svg{width:100%;height:100%;display:block}
-.meter .fillrect{transition:height .08s linear}
-.meter .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:28px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.35);pointer-events:none}
-@media (prefers-reduced-motion:no-preference){.meter.full{animation:beat .6s ease-in-out 3}}
+.err { min-height: 1.2em; margin: 8px 0 0; font-size: 14px; color: var(--err); }
+.ok { color: var(--accent); font-weight: 700; }
+
+.modes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.modes .mode:last-child { grid-column: 1 / -1; }
+.mode {
+  font: inherit; font-size: 18px; font-weight: 700;
+  padding: 22px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+  min-height: 72px;
+}
+.mode:hover, .mode:focus-visible { border-color: var(--accent); }
+
+.list { display: grid; gap: 10px; margin-top: 14px; }
+.pick {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center;
+  text-align: left; font: inherit;
+  padding: 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+  min-width: 0;
+}
+.pick:hover { border-color: var(--accent); }
+.pick .title { font-weight: 700; overflow-wrap: anywhere; }
+.pick .sub { font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
+.pick .price { font-weight: 700; color: var(--accent); white-space: nowrap; }
+
+.car { display: grid; gap: 10px; }
+.car img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; max-width: 100%; background: var(--chip); }
+.car-empty {
+  padding: 28px 16px; text-align: center; color: var(--muted);
+  border: 1.5px dashed var(--line); border-radius: 14px;
+}
+
+.summary {
+  margin: 0 0 14px; padding: 12px 14px;
+  border-radius: 12px; background: var(--chip);
+  font-size: 14px; overflow-wrap: anywhere;
+}
+.fieldrow { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; }
+.fieldrow > div { min-width: 0; }
+@media (max-width: 420px) { .fieldrow { grid-template-columns: minmax(0, 1fr); } }
 </style>
 </head>
 <body>
-<div class="stars" aria-hidden="true"></div>
-<canvas id="fx" aria-hidden="true"></canvas>
-
 <main>
-  <!-- Stage 1: the closed gift -->
-  <section class="gift" id="gift">
-    <h1>A thank-you is waiting for <em>Laali</em></h1>
-    <button class="box" id="box" type="button" aria-label="Open your thank-you">
-      <div class="scene">
-        <div class="face back"></div><div class="face left"></div><div class="face bottom"></div><div class="glowin"></div>
-        <div class="face right"></div><div class="face front"></div>
-        <div class="lid3">
-          <div class="face back"></div><div class="face left"></div><div class="face right"></div><div class="face top"><div class="bow"><i></i></div></div><div class="face front"></div>
-        </div>
-      </div>
-    </button>
-    <p class="hint" id="hint">Tap the gift to open it</p>
+  <header class="brand">
+    <p class="kicker">Ravi Renewables Pvt Ltd</p>
+    <h1>Travel Desk</h1>
+    <p class="lede" id="lede">Start with your name or designation.</p>
+  </header>
+
+  <!-- Step 1: who is travelling -->
+  <section class="card" id="s-who">
+    <form id="whoForm" novalidate>
+      <label for="who">Name or designation</label>
+      <input id="who" type="text" maxlength="80" autocomplete="name" placeholder="e.g. Devendra Rathi, VP Finance">
+      <p class="err" id="whoErr" role="alert"></p>
+      <button class="btn primary" type="submit">Continue</button>
+    </form>
   </section>
 
-  <!-- Stage 2: the thank-you -->
-  <section class="reveal" id="reveal" aria-live="polite">
-    <h1><small>from my heart</small>Thank you,<br>Laali.</h1>
-    <svg class="heart-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 2.6 5 6.3 5c2.2 0 3.5 1.3 4.7 2.9C12.2 6.3 13.5 5 15.7 5c3.7 0 5.4 3.6 3.9 6.9C19.5 16.4 12 21 12 21z" fill="#E0457B"/></svg>
-    <img class="photo" id="photo" alt="" hidden>
-    <p class="msg" id="msg"></p>
-    <p class="from" id="from"></p>
+  <!-- Step 2: choose mode -->
+  <section class="card" id="s-mode" hidden>
+    <div class="crumb">
+      <span>Traveller: <strong data-who></strong></span>
+      <button class="link" type="button" data-goto="s-who">Change</button>
+    </div>
+    <h2>How are you travelling?</h2>
+    <div class="modes">
+      <button class="mode" type="button" data-mode="car">Car</button>
+      <button class="mode" type="button" data-mode="train">Train</button>
+      <button class="mode" type="button" data-mode="flight">Flight</button>
+      <button class="mode" type="button" data-mode="cab">Cab</button>
+      <button class="mode" type="button" data-mode="other">Other</button>
+    </div>
+  </section>
 
-    <form class="noteform" id="noteform">
-      <h3>If you love me, write something 💗</h3>
-      <p>Anything at all — I will read every word.</p>
-      <textarea id="notetext" placeholder="Your note…" required></textarea>
-      <button class="btn" id="notesend" type="submit">Send note</button>
-      <p class="sent" id="notesent" hidden></p>
-      <button class="btn quiet" id="noteanother" type="button" hidden>Write another note</button>
+  <!-- Step 3a: car fleet -->
+  <section class="card" id="s-car" hidden>
+    <div class="crumb"><button class="link" type="button" data-goto="s-mode">Back</button></div>
+    <h2>Choose a vehicle</h2>
+    <div id="carGrid" class="list car"></div>
+  </section>
+
+  <!-- Step 3b: train search -->
+  <section class="card" id="s-train" hidden>
+    <div class="crumb"><button class="link" type="button" data-goto="s-mode">Back</button></div>
+    <h2>Where do you want to go?</h2>
+    <form id="trainForm" novalidate>
+      <label for="tFrom">From</label>
+      <input id="tFrom" type="text" maxlength="60" placeholder="e.g. Ghaziabad">
+      <label for="tTo">To</label>
+      <input id="tTo" type="text" maxlength="60" placeholder="e.g. Pune">
+      <label for="tDate">Travel date</label>
+      <input id="tDate" type="date">
+      <p class="err" id="trainErr" role="alert"></p>
+      <button class="btn primary" type="submit">Find trains</button>
     </form>
-    <section class="games" id="games">
-      <h2>Play a little 💗</h2>
-      <div class="tabs" role="tablist">
-        <button class="tab" role="tab" aria-selected="true" data-p="p1" type="button">Catch the hearts</button>
-        <button class="tab" role="tab" aria-selected="false" data-p="p2" type="button">Scratch card</button>
-        <button class="tab" role="tab" aria-selected="false" data-p="p3" type="button">Love meter</button>
-      </div>
-      <div class="panel show" id="p1" role="tabpanel">
-        <p>Tap the hearts as they float by — each one tells you something.</p>
-        <div class="sky" id="sky"></div>
-        <div class="score" id="score">0 caught</div>
-        <div class="line" id="line1"></div>
-        <button class="btn" id="startCatch" type="button">Start</button>
-      </div>
-      <div class="panel" id="p2" role="tabpanel">
-        <p>Scratch the gold with your finger or mouse.</p>
-        <div class="scratch" id="scratch"><div class="under" id="under"></div><canvas id="scratchcv"></canvas></div>
-        <button class="btn quiet" id="newCard" type="button">New card</button>
-      </div>
-      <div class="panel" id="p3" role="tabpanel">
-        <p>Press and hold the heart to see how much I appreciate you.</p>
-        <div class="meter" id="meter">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <defs><clipPath id="hclip"><path d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 2.6 5 6.3 5c2.2 0 3.5 1.3 4.7 2.9C12.2 6.3 13.5 5 15.7 5c3.7 0 5.4 3.6 3.9 6.9C19.5 16.4 12 21 12 21z"/></clipPath></defs>
-            <path d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 2.6 5 6.3 5c2.2 0 3.5 1.3 4.7 2.9C12.2 6.3 13.5 5 15.7 5c3.7 0 5.4 3.6 3.9 6.9C19.5 16.4 12 21 12 21z" fill="#fff" stroke="#E0457B" stroke-width=".8"/>
-            <rect class="fillrect" id="fillrect" x="0" y="24" width="24" height="0" fill="#E0457B" clip-path="url(#hclip)"/>
-          </svg>
-          <div class="pct" id="pct">0%</div>
+    <div id="trainList" class="list"></div>
+  </section>
+
+  <!-- Step 4: train billing, sent to WhatsApp group -->
+  <section class="card" id="s-billing" hidden>
+    <div class="crumb"><button class="link" type="button" data-goto="s-train">Back to trains</button></div>
+    <h2>Billing details</h2>
+    <p class="summary" id="trainSummary"></p>
+    <form id="billingForm" novalidate>
+      <label for="bEntity">Bill to</label>
+      <select id="bEntity">
+        <option>Ravi Renewables Pvt Ltd</option>
+        <option>Other</option>
+      </select>
+      <div class="fieldrow">
+        <div>
+          <label for="bGst">GST number</label>
+          <input id="bGst" type="text" maxlength="20" placeholder="Optional">
         </div>
-        <div class="line" id="line3">Hold…</div>
+        <div>
+          <label for="bCost">Cost centre</label>
+          <input id="bCost" type="text" maxlength="60">
+        </div>
       </div>
-    </section>
-    <button class="btn quiet" id="again" type="button">Read it again</button>
+      <div class="fieldrow">
+        <div>
+          <label for="bDate">Travel date</label>
+          <input id="bDate" type="date" required>
+        </div>
+        <div>
+          <label for="bPax">Passengers</label>
+          <input id="bPax" type="number" min="1" max="10" value="1" required>
+        </div>
+      </div>
+      <label for="bNotes">Notes</label>
+      <textarea id="bNotes" maxlength="300"></textarea>
+      <p class="err" id="billingErr" role="alert"></p>
+      <button class="btn primary" type="submit">Send to WhatsApp group</button>
+    </form>
+  </section>
+
+  <!-- Step 3c: details for flight, cab, other, and car -->
+  <section class="card" id="s-details" hidden>
+    <div class="crumb"><button class="link" type="button" data-goto="s-mode">Back</button></div>
+    <h2 id="detailsTitle"></h2>
+    <form id="detailsForm" novalidate>
+      <div id="detailsFields"></div>
+      <p class="err" id="detailsErr" role="alert"></p>
+      <button class="btn primary" type="submit" id="detailsSubmit">Send request</button>
+    </form>
+  </section>
+
+  <!-- Done -->
+  <section class="card" id="s-done" hidden>
+    <h2>Request sent</h2>
+    <p class="ok">The travel desk has your request.</p>
+    <button class="btn" type="button" id="again">Make another request</button>
   </section>
 </main>
 
 <script>
-// ════════════════ EDIT HERE ════════════════
-const NAME = "Laali";
-const PHOTO = "";                              // e.g. "welcome/laali.jpg" — leave "" for no photo
-const MESSAGE = "Thank you for your kindness, your patience, and for being there for the people around you. I do not say it often enough, so I am saying it now: I am grateful for you.";
-const FROM = "With love and thanks, from me";
-// Lines revealed by the games (one per caught heart / scratch card). Add as many as you like.
-const LINES = [
-  "Thank you for always listening.",
-  "Thank you for your patience with me.",
-  "Thank you for the laughs on the hard days.",
-  "Thank you for believing in me.",
-  "Thank you for your kindness to everyone around you.",
-  "Thank you for simply being you.",
-];
-const SECRET = "You mean more to me than I can say. Thank you, Laali.";
-// Notes are posted silently to ntfy.sh (free relay, no account needed). Read them at https://ntfy.sh/<NOTE_TOPIC>
-// (kept there for about 12 hours), or subscribe to that topic in the ntfy app on your phone.
-const NOTE_TOPIC = "rudrakshi-gift-8162d6ad";  // same secret topic as before, so an existing ntfy subscription keeps working
-const NOTE_NOTIFY_EMAIL = "";                   // optional: your e-mail address, e.g. "name@gmail.com", to get each note by mail
-// ═══════════════════════════════════════════
+(function () {
+  // ---- Settings: edit these ----
+  // ntfy topic that receives car, flight, cab and other requests. Subscribe to it in the ntfy app.
+  var TRAVEL_TOPIC = 'ravi-travel-desk-8162d6ad';
 
-const $=id=>document.getElementById(id);
+  // Vehicles the company uses. Add one entry per vehicle: name, seats, fuel, reg, photo (file in the repo, e.g. "cars/swift.jpg").
+  var CARS = [];
 
+  // Train options. Add one entry per train: no, name, from, to, dep (departure time), fare (number, in rupees).
+  var TRAINS = [];
 
-// ── Text and photo ──
-$('msg').textContent=MESSAGE; $('from').textContent=FROM;
-if(PHOTO){$('photo').src=PHOTO;$('photo').hidden=false;$('photo').alt=NAME}
+  var VEHICLE_OPTS = ['Cab', 'Personal car', 'Personal bike', 'Other'];
+  var FIELDS = {
+    flight: [
+      { id: 'from', label: 'From city', type: 'text', req: true },
+      { id: 'to', label: 'To city', type: 'text', req: true },
+      { id: 'date', label: 'Travel date', type: 'date', req: true },
+      { id: 'time', label: 'Preferred time', type: 'time' },
+      { id: 'notes', label: 'Notes (airline, bags, seat)', type: 'textarea' }
+    ],
+    car: [
+      { id: 'from', label: 'Pick-up place', type: 'text', req: true },
+      { id: 'to', label: 'Drop place', type: 'text', req: true },
+      { id: 'date', label: 'Date', type: 'date', req: true },
+      { id: 'time', label: 'Time', type: 'time', req: true }
+    ],
+    vehicle: [
+      { id: 'vtype', label: 'Vehicle type', type: 'select', opts: VEHICLE_OPTS, req: true },
+      { id: 'owner', label: 'Driver or owner name', type: 'text', req: true },
+      { id: 'contact', label: 'Contact number', type: 'tel', req: true },
+      { id: 'vno', label: 'Vehicle number', type: 'text', req: true },
+      { id: 'from', label: 'Pick-up place', type: 'text', req: true },
+      { id: 'to', label: 'Drop place', type: 'text', req: true },
+      { id: 'date', label: 'Date', type: 'date', req: true },
+      { id: 'time', label: 'Time', type: 'time', req: true }
+    ],
+    other: [
+      { id: 'desc', label: 'Describe the trip', type: 'textarea', req: true },
+      { id: 'date', label: 'Date', type: 'date', req: true }
+    ]
+  };
+  var MODE_LABEL = { car: 'Car', train: 'Train', flight: 'Flight', cab: 'Cab', other: 'Other' };
+  var LEDE = {
+    's-who': 'Start with your name or designation.',
+    's-mode': 'Pick how you are travelling.',
+    's-car': 'Pick a vehicle for your trip.',
+    's-train': 'Find trains from cheapest to most expensive.',
+    's-billing': 'Add billing details, then send to the WhatsApp group.',
+    's-details': 'Fill in the details and send.',
+    's-done': 'Thank you.'
+  };
 
-// ── Open the gift ──
-$('box').addEventListener('click',()=>{
- if($('box').classList.contains('open')) return;
- $('box').classList.add('open'); $('hint').textContent='';
- burst(.8); hearts(26);
- setTimeout(()=>{ $('gift').style.display='none'; $('reveal').classList.add('show'); window.scrollTo({top:0}); burst(1); hearts(14); },1500);
-});
+  var state = { who: '', mode: '', car: null, train: null };
 
-// ── Note form: posts to ntfy so it reaches you without her leaving the page ──
-$('noteform').addEventListener('submit',async e=>{
- e.preventDefault();
- const note=$('notetext').value.trim(); if(!note) return;
- $('notesend').disabled=true; $('notesend').textContent='Sending…';
- const headers={'Title':'Note from '+NAME,'Tags':'heart','Priority':'high'};
- if(NOTE_NOTIFY_EMAIL) headers['Email']=NOTE_NOTIFY_EMAIL;
- let ok=false;
- try{ const r=await fetch('https://ntfy.sh/'+NOTE_TOPIC,{method:'POST',headers,body:note+'\n— '+NAME+', '+new Date().toLocaleString('en-IN')}); ok=r.ok; }catch(err){}
- if(!ok){
-  $('notesend').disabled=false; $('notesend').textContent='Send note';
-  $('notesent').textContent='Could not send just now — please check the internet and tap Send again.'; $('notesent').hidden=false; return;
- }
- $('notesent').textContent='Thank you, your note has been sent 💛'; $('notesent').hidden=false;
- $('notesend').hidden=true; $('notetext').readOnly=true; $('noteanother').hidden=false;
- burst(1); hearts(12);
-});
-function resetNoteForm(){
- $('notetext').value=''; $('notetext').readOnly=false; $('notesent').hidden=true;
- $('notesend').hidden=false; $('notesend').disabled=false; $('notesend').textContent='Send note'; $('noteanother').hidden=true;
-}
-$('noteanother').addEventListener('click',()=>{ resetNoteForm(); $('notetext').focus(); });
-$('again').addEventListener('click',()=>{ resetNoteForm(); window.scrollTo({top:0}); burst(1); hearts(10); });
+  function $(id) { return document.getElementById(id); }
+  function rupees(n) { return '₹' + Number(n).toLocaleString('en-IN'); }
 
-// ── Games ──
-document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
- document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x===t));
- document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('show',p.id===t.dataset.p));
- if(t.dataset.p==='p2') setTimeout(newCard,50);
-}));
+  function show(id) {
+    var sections = document.querySelectorAll('main > section');
+    for (var i = 0; i < sections.length; i++) {
+      sections[i].hidden = sections[i].id !== id;
+    }
+    $('lede').textContent = LEDE[id] || '';
+    window.scrollTo(0, 0);
+  }
 
-// 1 · catch the hearts
-let caught=0, spawn=null, lineIdx=0;
-function spawnHeart(){
- const h=document.createElement('button'); h.className='fly'; h.type='button'; h.textContent=Math.random()<.5?'♥':'♡'; h.setAttribute('aria-label','heart');
- h.style.left=(5+Math.random()*85)+'%'; h.style.setProperty('--s',(22+Math.random()*22)+'px'); h.style.setProperty('--t',(3.2+Math.random()*2.5)+'s');
- const catchIt=e=>{ if(h.classList.contains('pop')) return; e.preventDefault(); h.classList.add('pop'); caught++;
-  $('score').textContent=caught+' caught'; $('line1').textContent=LINES[lineIdx++%LINES.length]; burst(.25);
-  if(caught%LINES.length===0){ $('line1').textContent='That is all of them — and still not enough. 💛'; } };
- h.addEventListener('pointerdown',catchIt);
- $('sky').appendChild(h); setTimeout(()=>h.remove(),6000);
-}
-$('startCatch').addEventListener('click',()=>{
- if(spawn){ clearInterval(spawn); spawn=null; $('startCatch').textContent='Start'; return; }
- caught=0; lineIdx=0; $('score').textContent='0 caught'; $('line1').textContent=''; $('sky').innerHTML='';
- spawnHeart(); spawn=setInterval(spawnHeart,700); $('startCatch').textContent='Stop';
-});
+  function setWho() {
+    var els = document.querySelectorAll('[data-who]');
+    for (var i = 0; i < els.length; i++) els[i].textContent = state.who;
+  }
 
-// 2 · scratch card
-const scv=$('scratchcv'), sctx=scv.getContext('2d'); let scratching=false, revealed=false, cardIdx=0;
-function newCard(){
- const box=$('scratch'), r=box.getBoundingClientRect(); if(!r.width) return;
- scv.width=Math.round(r.width*devicePixelRatio); scv.height=Math.round(r.height*devicePixelRatio); sctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
- scv.style.opacity=1; revealed=false;
- $('under').textContent=cardIdx===0?SECRET:LINES[(cardIdx-1)%LINES.length]; cardIdx++;
- sctx.globalCompositeOperation='source-over';
- const g=sctx.createLinearGradient(0,0,r.width,r.height); g.addColorStop(0,'#F9A8C7'); g.addColorStop(.5,'#E0457B'); g.addColorStop(1,'#B3295C');
- sctx.fillStyle=g; sctx.fillRect(0,0,r.width,r.height);
- sctx.fillStyle='rgba(255,255,255,.85)'; sctx.font='700 18px '+getComputedStyle(document.body).fontFamily; sctx.textAlign='center'; sctx.fillText('scratch here ✦',r.width/2,r.height/2+6);
- sctx.globalCompositeOperation='destination-out'; sctx.lineWidth=34; sctx.lineCap='round'; sctx.lineJoin='round';
-}
-function scratchAt(e){ const r=scv.getBoundingClientRect(); const x=e.clientX-r.left,y=e.clientY-r.top; sctx.lineTo(x,y); sctx.stroke(); sctx.beginPath(); sctx.moveTo(x,y); }
-function checkReveal(){
- if(revealed) return; const r=scv.getBoundingClientRect(); const d=sctx.getImageData(0,0,scv.width,scv.height).data; let clear=0;
- for(let i=3;i<d.length;i+=4*16) if(d[i]===0) clear++;
- if(clear/(d.length/(4*16))>.45){ revealed=true; scv.style.transition='opacity .6s'; scv.style.opacity=0; burst(.8); hearts(10); }
-}
-scv.addEventListener('pointerdown',e=>{scratching=true;scv.setPointerCapture(e.pointerId);sctx.beginPath();scratchAt(e)});
-scv.addEventListener('pointermove',e=>{ if(scratching){scratchAt(e)} });
-['pointerup','pointercancel','pointerleave'].forEach(ev=>scv.addEventListener(ev,()=>{ if(scratching){scratching=false;checkReveal()} }));
-$('newCard').addEventListener('click',newCard);
+  // Back and navigation buttons
+  document.addEventListener('click', function (e) {
+    var g = e.target.closest('[data-goto]');
+    if (g) show(g.getAttribute('data-goto'));
+  });
 
-// 3 · love meter (hold to fill; it never stops at 100)
-let holding=false, level=0, meterRaf=null;
-const METER_LINES=[[0,'Hold…'],[25,'Getting warmer…'],[50,'Halfway there…'],[75,'Almost…'],[100,'100% — and still counting'],[150,'It does not stop at 100.'],[250,'More than this heart can hold. 💛']];
-function meterTick(){
- level+= holding? 1.6 : -3; if(level<0) level=0; if(level>999) level=999;
- const shown=Math.min(level,100); $('fillrect').setAttribute('y',24-24*shown/100); $('fillrect').setAttribute('height',24*shown/100);
- $('pct').textContent=Math.round(level)+'%';
- let txt='Hold…'; for(const [v,t] of METER_LINES) if(level>=v) txt=t; $('line3').textContent=txt;
- $('meter').classList.toggle('full',level>=100);
- if(holding||level>0) meterRaf=requestAnimationFrame(meterTick); else meterRaf=null;
-}
-const startHold=e=>{e.preventDefault();holding=true;if(!meterRaf)meterRaf=requestAnimationFrame(meterTick)};
-const endHold=()=>{holding=false};
-$('meter').addEventListener('pointerdown',startHold); ['pointerup','pointercancel','pointerleave'].forEach(ev=>$('meter').addEventListener(ev,endHold));
-$('meter').addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){startHold(e)}}); $('meter').addEventListener('keyup',endHold); $('meter').tabIndex=0;
+  // Step 1
+  $('whoForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = $('who').value.trim();
+    if (!v) {
+      $('whoErr').textContent = 'Please type your name or designation.';
+      $('who').focus();
+      return;
+    }
+    $('whoErr').textContent = '';
+    state.who = v;
+    setWho();
+    show('s-mode');
+  });
 
-// ── Floating hearts ──
-function hearts(n){
- if(matchMedia('(prefers-reduced-motion:reduce)').matches) return;
- const r=$('box').getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2;
- for(let i=0;i<n;i++){const h=document.createElement('span');h.className='heart';h.textContent=['♥','♡','♥'][i%3];
-  h.style.left=(cx-12+(Math.random()-.5)*r.width)+'px';h.style.top=(cy+(Math.random()-.5)*40)+'px';
-  h.style.setProperty('--dx',((Math.random()-.5)*260)+'px');h.style.setProperty('--rot',((Math.random()-.5)*60)+'deg');
-  h.style.setProperty('--sz',(14+Math.random()*22)+'px');h.style.setProperty('--dur',(2.2+Math.random()*1.8)+'s');
-  h.style.animationDelay=(Math.random()*.6)+'s';h.style.color=i%4?'var(--rosegold)':'var(--gold)';
-  document.body.appendChild(h);setTimeout(()=>h.remove(),4800)}
-}
+  // Step 2
+  document.querySelectorAll('[data-mode]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      state.mode = b.getAttribute('data-mode');
+      state.car = null;
+      state.train = null;
+      if (state.mode === 'car') {
+        renderCars();
+        show('s-car');
+      } else if (state.mode === 'train') {
+        show('s-train');
+      } else {
+        buildDetails(state.mode, MODE_LABEL[state.mode] + ' request', FIELDS[state.mode === 'flight' ? 'flight' : 'vehicle']);
+      }
+    });
+  });
 
-// ── Confetti (no library) ──
-const cv=$('fx'),ctx=cv.getContext('2d');let parts=[],raf=null;
-function size(){cv.width=innerWidth*devicePixelRatio;cv.height=innerHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
-size();addEventListener('resize',size);
-const COLORS=['#E0457B','#FFC2D6','#F08BAE','#FFD700','#ffffff'];
-function burst(k){
- if(matchMedia('(prefers-reduced-motion:reduce)').matches) return;
- const n=Math.round(140*k);
- for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=4+Math.random()*9;
-  parts.push({x:innerWidth/2,y:innerHeight*0.45,vx:Math.cos(a)*v,vy:Math.sin(a)*v-6,r:4+Math.random()*5,c:COLORS[i%COLORS.length],rot:Math.random()*6,vr:(Math.random()-.5)*.3,life:1,shape:Math.random()<.5?0:1})}
- if(!raf) raf=requestAnimationFrame(draw);
-}
-function draw(){
- ctx.clearRect(0,0,innerWidth,innerHeight);
- parts=parts.filter(p=>p.life>0&&p.y<innerHeight+40);
- for(const p of parts){p.vy+=.22;p.vx*=.985;p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.life-=.004;
-  ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.globalAlpha=Math.min(1,p.life*2);ctx.fillStyle=p.c;
-  if(p.shape){ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r)}else{ctx.beginPath();ctx.arc(0,0,p.r/1.5,0,7);ctx.fill()}
-  ctx.restore()}
- raf=parts.length?requestAnimationFrame(draw):(ctx.clearRect(0,0,innerWidth,innerHeight),null);
-}
+  // Step 3a: car fleet
+  function renderCars() {
+    var grid = $('carGrid');
+    grid.textContent = '';
+    if (!CARS.length) {
+      var empty = document.createElement('p');
+      empty.className = 'car-empty';
+      empty.textContent = 'Our vehicle list is being added. Please check back soon, or choose Cab or Other.';
+      grid.appendChild(empty);
+      return;
+    }
+    CARS.forEach(function (c) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pick';
+      var t = document.createElement('span');
+      t.className = 'title';
+      t.textContent = c.name;
+      var s = document.createElement('span');
+      s.className = 'sub';
+      s.textContent = [c.seats ? c.seats + ' seats' : '', c.fuel || '', c.reg || ''].filter(Boolean).join(' · ');
+      btn.appendChild(t);
+      btn.appendChild(s);
+      if (c.photo) {
+        var img = document.createElement('img');
+        img.src = c.photo;
+        img.alt = c.name;
+        img.loading = 'lazy';
+        img.style.gridColumn = '1 / -1';
+        btn.appendChild(img);
+      }
+      btn.addEventListener('click', function () {
+        state.car = c;
+        buildDetails('car', 'Car: ' + c.name, FIELDS.car);
+      });
+      grid.appendChild(btn);
+    });
+  }
+
+  // Step 3b: trains, cheapest first
+  $('trainForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var from = $('tFrom').value.trim().toLowerCase();
+    var to = $('tTo').value.trim().toLowerCase();
+    if (!to) {
+      $('trainErr').textContent = 'Please type where you want to go.';
+      $('tTo').focus();
+      return;
+    }
+    $('trainErr').textContent = '';
+    var found = TRAINS.filter(function (t) {
+      return t.to.toLowerCase().indexOf(to) !== -1 && (!from || t.from.toLowerCase().indexOf(from) !== -1);
+    }).sort(function (a, b) { return a.fare - b.fare; });
+
+    var list = $('trainList');
+    list.textContent = '';
+    if (!TRAINS.length) {
+      var none = document.createElement('p');
+      none.className = 'car-empty';
+      none.textContent = 'Train options are not loaded yet. Please ask the travel desk.';
+      list.appendChild(none);
+      return;
+    }
+    if (!found.length) {
+      var nf = document.createElement('p');
+      nf.className = 'car-empty';
+      nf.textContent = 'No trains found for that route.';
+      list.appendChild(nf);
+      return;
+    }
+    found.forEach(function (t) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pick';
+      var title = document.createElement('span');
+      title.className = 'title';
+      title.textContent = t.name + ' (' + t.no + ')';
+      var sub = document.createElement('span');
+      sub.className = 'sub';
+      sub.textContent = t.from + ' to ' + t.to + ' · departs ' + t.dep;
+      var price = document.createElement('span');
+      price.className = 'price';
+      price.textContent = rupees(t.fare);
+      btn.appendChild(title);
+      btn.appendChild(sub);
+      btn.appendChild(price);
+      btn.addEventListener('click', function () { chooseTrain(t); });
+      list.appendChild(btn);
+    });
+  });
+
+  function chooseTrain(t) {
+    state.train = t;
+    $('trainSummary').textContent = t.name + ' (' + t.no + ') · ' + t.from + ' to ' + t.to + ' · departs ' + t.dep + ' · ' + rupees(t.fare);
+    if ($('tDate').value) $('bDate').value = $('tDate').value;
+    $('billingErr').textContent = '';
+    show('s-billing');
+  }
+
+  // Step 4: train billing, sent to a WhatsApp group chosen by the traveller
+  $('billingForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var err = $('billingErr');
+    err.textContent = '';
+    if (!$('bDate').value) { err.textContent = 'Please pick the travel date.'; $('bDate').focus(); return; }
+    var pax = parseInt($('bPax').value, 10);
+    if (!pax || pax < 1) { err.textContent = 'Please enter the number of passengers.'; $('bPax').focus(); return; }
+
+    var t = state.train;
+    var lines = [
+      '*Train booking request*',
+      'Traveller: ' + state.who,
+      'Train: ' + t.name + ' (' + t.no + ')',
+      'Route: ' + t.from + ' to ' + t.to,
+      'Departs: ' + t.dep,
+      'Fare: ' + rupees(t.fare) + ' per passenger',
+      'Travel date: ' + $('bDate').value,
+      'Passengers: ' + pax,
+      '',
+      '*Billing*',
+      'Bill to: ' + $('bEntity').value,
+      'GST: ' + ($('bGst').value.trim() || '-'),
+      'Cost centre: ' + ($('bCost').value.trim() || '-')
+    ];
+    if ($('bNotes').value.trim()) lines.push('Notes: ' + $('bNotes').value.trim());
+
+    // Opens WhatsApp so the traveller picks the group and sends.
+    window.location.href = 'https://wa.me/?text=' + encodeURIComponent(lines.join('\n'));
+  });
+
+  // Step 3c: details form, built from the field list
+  function buildDetails(mode, title, fields) {
+    state.mode = mode;
+    $('detailsTitle').textContent = title;
+    $('detailsErr').textContent = '';
+    var box = $('detailsFields');
+    box.textContent = '';
+
+    var sum = document.createElement('p');
+    sum.className = 'summary';
+    sum.textContent = 'Traveller: ' + state.who;
+    box.appendChild(sum);
+
+    var row = null;
+    fields.forEach(function (f) {
+      var wrap = document.createElement('div');
+      var lab = document.createElement('label');
+      lab.htmlFor = 'f-' + f.id;
+      lab.textContent = f.label + (f.req ? ' *' : '');
+      wrap.appendChild(lab);
+      var input;
+      if (f.type === 'select') {
+        input = document.createElement('select');
+        f.opts.forEach(function (o) {
+          var op = document.createElement('option');
+          op.textContent = o;
+          input.appendChild(op);
+        });
+      } else if (f.type === 'textarea') {
+        input = document.createElement('textarea');
+        input.maxLength = 300;
+      } else {
+        input = document.createElement('input');
+        input.type = f.type;
+        input.maxLength = 80;
+      }
+      input.id = 'f-' + f.id;
+      input.name = f.id;
+      if (f.req) input.required = true;
+      if (f.id === 'date' || f.id === 'time') { /* native pickers */ }
+      wrap.appendChild(input);
+
+      // Put short fields side by side on wide screens
+      if (f.type === 'date' || f.type === 'time') {
+        if (!row) { row = document.createElement('div'); row.className = 'fieldrow'; box.appendChild(row); }
+        row.appendChild(wrap);
+        if (row.children.length === 2) row = null;
+      } else {
+        row = null;
+        box.appendChild(wrap);
+      }
+    });
+
+    $('detailsSubmit').disabled = false;
+    show('s-details');
+  }
+
+  $('detailsForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var fields = [];
+    var box = $('detailsFields');
+    var inputs = box.querySelectorAll('input, select, textarea');
+    var missing = false;
+    for (var i = 0; i < inputs.length; i++) {
+      var el = inputs[i];
+      if (el.required && !el.value.trim()) { missing = true; }
+    }
+    if (missing) {
+      $('detailsErr').textContent = 'Please fill in all fields marked *.';
+      return;
+    }
+    $('detailsErr').textContent = '';
+
+    var mode = state.mode;
+    var label = MODE_LABEL[mode] || mode;
+    var lines = ['Traveller: ' + state.who, 'Mode: ' + label];
+    if (mode === 'car' && state.car) {
+      lines.push('Vehicle: ' + state.car.name + (state.car.reg ? ' (' + state.car.reg + ')' : ''));
+    }
+    for (var j = 0; j < inputs.length; j++) {
+      var inp = inputs[j];
+      var v = inp.value.trim();
+      if (!v) continue;
+      var lab = box.querySelector('label[for="' + inp.id + '"]');
+      lines.push((lab ? lab.textContent.replace(' *', '') : inp.name) + ': ' + v);
+    }
+    fields = lines.join('\n');
+
+    var btn = $('detailsSubmit');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    fetch('https://ntfy.sh/' + TRAVEL_TOPIC, {
+      method: 'POST',
+      headers: { 'Title': 'Travel request: ' + label, 'Tags': 'airplane' },
+      body: fields
+    }).then(function (res) {
+      if (!res.ok) throw new Error('bad status');
+      btn.textContent = 'Send request';
+      show('s-done');
+    }).catch(function () {
+      btn.disabled = false;
+      btn.textContent = 'Send request';
+      $('detailsErr').textContent = 'Could not send. Check your connection and try again.';
+    });
+  });
+
+  $('again').addEventListener('click', function () {
+    state.mode = ''; state.car = null; state.train = null;
+    show('s-mode');
+  });
+})();
 </script>
 </body>
 </html>

@@ -561,7 +561,16 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
     if ($('bNotes').value.trim()) lines.push('Notes: ' + $('bNotes').value.trim());
 
     // Opens WhatsApp so the traveller picks the group and sends.
-    window.location.href = 'https://wa.me/?text=' + encodeURIComponent(lines.join('\n'));
+    // Also send the booking to ntfy, then open WhatsApp whether or not ntfy answered.
+    var waUrl = 'https://wa.me/?text=' + encodeURIComponent(lines.join('\n'));
+    var body = lines.join('\n');
+    fetch('https://ntfy.sh/' + TRAVEL_TOPIC, {
+      method: 'POST',
+      headers: { 'Title': 'Travel request: Train', 'Tags': 'train' },
+      body: body
+    }).catch(function () {}).then(function () {
+      window.location.href = waUrl;
+    });
   });
 
   // Step 3c: details form, built from the field list

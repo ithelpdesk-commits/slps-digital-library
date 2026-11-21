@@ -293,6 +293,10 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
   // Train options. Add one entry per train: no, name, from, to, dep (departure time), dur (journey time in minutes), fare (number, in rupees).
   var TRAINS = [];
 
+  // Live train search. Paste the address of your Cloudflare Worker (worker.js) here, e.g. 'https://travel-desk.yourname.workers.dev/'.
+  // Leave empty to use the TRAINS list above.
+  var TRAIN_API = '';
+
   var VEHICLE_OPTS = ['Cab', 'Personal car', 'Personal bike', 'Other'];
   var FIELDS = {
     flight: [
@@ -430,54 +434,45 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
     });
   }
 
-  // Step 3b: trains, cheapest first
-  $('trainForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var from = $('tFrom').value.trim().toLowerCase();
-    var to = $('tTo').value.trim().toLowerCase();
-    if (!to) {
-      $('trainErr').textContent = 'Please type where you want to go.';
-      $('tTo').focus();
-      return;
-    }
-    $('trainErr').textContent = '';
-    var found = TRAINS.filter(function (t) {
-      return t.to.toLowerCase().indexOf(to) !== -1 && (!from || t.from.toLowerCase().indexOf(from) !== -1);
-    }).sort(function (a, b) { return a.fare - b.fare; });
-
+  // Step 3b: trains. Live search through the Worker when TRAIN_API is set, otherwise the TRAINS list.
+  function trainNote(text) {
     var list = $('trainList');
     list.textContent = '';
-    if (!TRAINS.length) {
-      var none = document.createElement('p');
-      none.className = 'car-empty';
-      none.textContent = 'Train options are not loaded yet. Please ask the travel desk.';
-      list.appendChild(none);
-      return;
-    }
-    if (!found.length) {
-      var nf = document.createElement('p');
-      nf.className = 'car-empty';
-      nf.textContent = 'No trains found for that route.';
-      list.appendChild(nf);
-      return;
-    }
-    // Recommendation: fastest train, and the cheapest fare (shortest time breaks a tie)
+    var p = document.createElement('p');
+    p.className = 'car-empty';
+    p.textContent = text;
+    list.appendChild(p);
+  }
+
+  function hasFare(t) { return typeof t.fare === 'number'; }
+  function fareText(t) { return hasFare(t) ? rupees(t.fare) : 'Fare at booking'; }
+
+  function renderTrains(found) {
+    var list = $('trainList');
+    list.textContent = '';
+    if (!found.length) { trainNote('No direct trains found for that route.'); return; }
+
+    var priced = found.every(hasFare);
+    found.sort(function (a, b) { return priced ? (a.fare - b.fare) || (a.dur - b.dur) : a.dur - b.dur; });
+
+    // Recommendation: fastest train, plus the cheapest fare when fares are known
     var fastest = found.reduce(function (a, b) { return b.dur < a.dur ? b : a; });
-    var cheapest = found.reduce(function (a, b) {
-      if (b.fare !== a.fare) return b.fare < a.fare ? b : a;
-      return b.dur < a.dur ? b : a;
-    });
     var rec = document.createElement('div');
     rec.className = 'rec';
     var h = document.createElement('p');
     h.className = 'rec-head';
     h.textContent = 'Our recommendation';
     rec.appendChild(h);
-    if (fastest === cheapest) {
-      rec.appendChild(recLine('Fastest and most cost-effective', fastest));
+    if (priced) {
+      var cheapest = found[0];
+      if (fastest === cheapest) {
+        rec.appendChild(recLine('Fastest and most cost-effective', fastest));
+      } else {
+        rec.appendChild(recLine('Fastest', fastest));
+        rec.appendChild(recLine('Most cost-effective', cheapest));
+      }
     } else {
       rec.appendChild(recLine('Fastest', fastest));
-      rec.appendChild(recLine('Most cost-effective', cheapest));
     }
     list.appendChild(rec);
 
@@ -490,21 +485,65 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
       title.textContent = t.name + ' (' + t.no + ')';
       var sub = document.createElement('span');
       sub.className = 'sub';
-      sub.textContent = t.from + ' to ' + t.to + ' · departs ' + t.dep + ' · ' + fmtDur(t.dur);
+      sub.textContent = t.from + ' to ' + t.to + ' · departs ' + t.dep +
+        (t.arr ? ' · arrives ' + t.arr : '') + ' · ' + fmtDur(t.dur);
       var price = document.createElement('span');
       price.className = 'price';
-      price.textContent = rupees(t.fare);
+      price.textContent = fareText(t);
       btn.appendChild(title);
       btn.appendChild(sub);
       btn.appendChild(price);
       btn.addEventListener('click', function () { chooseTrain(t); });
       list.appendChild(btn);
     });
+  }
+
+  var trainSearchNo = 0;
+  $('trainForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var fromRaw = $('tFrom').value.trim();
+    var toRaw = $('tTo').value.trim();
+    if (!toRaw) {
+      $('trainErr').textContent = 'Please type where you want to go.';
+      $('tTo').focus();
+      return;
+    }
+    if (TRAIN_API && !fromRaw) {
+      $('trainErr').textContent = 'Please type where you are starting from.';
+      $('tFrom').focus();
+      return;
+    }
+    $('trainErr').textContent = '';
+
+    if (!TRAIN_API) {
+      if (!TRAINS.length) { trainNote('Train options are not loaded yet. Please ask the travel desk.'); return; }
+      var from = fromRaw.toLowerCase(), to = toRaw.toLowerCase();
+      renderTrains(TRAINS.filter(function (t) {
+        return t.to.toLowerCase().indexOf(to) !== -1 && (!from || t.from.toLowerCase().indexOf(from) !== -1);
+      }));
+      return;
+    }
+
+    var mine = ++trainSearchNo;
+    trainNote('Finding trains...');
+    var url = TRAIN_API + '?from=' + encodeURIComponent(fromRaw) + '&to=' + encodeURIComponent(toRaw) +
+      ($('tDate').value ? '&date=' + $('tDate').value : '');
+    fetch(url).then(function (res) {
+      return res.json().catch(function () { return null; });
+    }).then(function (data) {
+      if (mine !== trainSearchNo) return;
+      if (!data) { trainNote('The train search did not answer. Please try again.'); return; }
+      if (!data.ok) { trainNote(data.error || 'The train search failed. Please try again.'); return; }
+      renderTrains(data.trains || []);
+    }).catch(function () {
+      if (mine !== trainSearchNo) return;
+      trainNote('Could not reach the train search. Check your connection and try again.');
+    });
   });
 
   function fmtDur(min) {
     var h = Math.floor(min / 60), m = min % 60;
-    return (h ? h + 'h ' : '') + (m ? m + 'm' : '').trim();
+    return ((h ? h + 'h ' : '') + (m ? m + 'm' : '')).trim() || '0m';
   }
 
   function recLine(label, t) {
@@ -518,7 +557,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
     title.textContent = t.name + ' (' + t.no + ')';
     var sub = document.createElement('span');
     sub.className = 'sub';
-    sub.textContent = t.dep + ' departure · ' + fmtDur(t.dur) + ' · ' + rupees(t.fare);
+    sub.textContent = t.dep + ' departure · ' + fmtDur(t.dur) + (hasFare(t) ? ' · ' + rupees(t.fare) : '');
     wrap.appendChild(k);
     wrap.appendChild(title);
     wrap.appendChild(sub);
@@ -527,7 +566,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 
   function chooseTrain(t) {
     state.train = t;
-    $('trainSummary').textContent = t.name + ' (' + t.no + ') · ' + t.from + ' to ' + t.to + ' · departs ' + t.dep + ' · ' + rupees(t.fare);
+    $('trainSummary').textContent = t.name + ' (' + t.no + ') · ' + t.from + ' to ' + t.to + ' · departs ' + t.dep + ' · ' + fareText(t);
     if ($('tDate').value) $('bDate').value = $('tDate').value;
     $('billingErr').textContent = '';
     show('s-billing');
@@ -549,7 +588,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
       'Train: ' + t.name + ' (' + t.no + ')',
       'Route: ' + t.from + ' to ' + t.to,
       'Departs: ' + t.dep,
-      'Fare: ' + rupees(t.fare) + ' per passenger',
+      'Fare: ' + (hasFare(t) ? rupees(t.fare) + ' per passenger' : 'to be confirmed at booking'),
       'Travel date: ' + $('bDate').value,
       'Passengers: ' + pax,
       '',

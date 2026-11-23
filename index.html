@@ -278,6 +278,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
       <div id="detailsFields"></div>
       <p class="err" id="detailsErr" role="alert"></p>
       <button class="btn primary" type="submit" id="detailsSubmit">Send request</button>
+      <button class="btn" type="button" id="detailsEmail" hidden>Send by email</button>
     </form>
   </section>
 
@@ -308,14 +309,22 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
   // Leave empty to use the TRAINS list above.
   var TRAIN_API = 'https://it-travel-desk.ithelpdesk-cf9.workers.dev/';
 
+  // Flight booking: where travellers book, and the email address that receives requests (leave empty to hide the email button).
+  var BOOKING_URL = 'https://www.makemytrip.com/';
+  var TRAVEL_EMAIL = '';
+
   var VEHICLE_OPTS = ['Cab', 'Personal car', 'Personal bike', 'Other'];
   var FIELDS = {
     flight: [
+      { id: 'ref', label: 'Booking reference (PNR)', type: 'text', req: true },
+      { id: 'airline', label: 'Airline', type: 'text', req: true },
+      { id: 'flightno', label: 'Flight number', type: 'text', req: true },
       { id: 'from', label: 'From city', type: 'text', req: true },
       { id: 'to', label: 'To city', type: 'text', req: true },
       { id: 'date', label: 'Travel date', type: 'date', req: true },
-      { id: 'time', label: 'Preferred time', type: 'time' },
-      { id: 'notes', label: 'Notes (airline, bags, seat)', type: 'textarea' }
+      { id: 'time', label: 'Departure time', type: 'time', req: true },
+      { id: 'fare', label: 'Total fare (Rs.)', type: 'text' },
+      { id: 'notes', label: 'Notes (bags, seat)', type: 'textarea' }
     ],
     car: [
       { id: 'from', label: 'Pick-up place', type: 'text', req: true },
@@ -677,30 +686,32 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
       }
     });
 
+    var oldLink = document.querySelector('.book-link');
+    if (oldLink) oldLink.parentNode.removeChild(oldLink);
+    if (mode === 'flight') {
+      var a = document.createElement('a');
+      a.className = 'btn book-link';
+      a.href = BOOKING_URL;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = '1. Book on MakeMyTrip';
+      $('detailsTitle').insertAdjacentElement('afterend', a);
+      var note = document.createElement('p');
+      note.className = 'muted book-link';
+      note.style.margin = '10px 0 0';
+      note.textContent = '2. Then fill in your booking details below.';
+      a.insertAdjacentElement('afterend', note);
+    }
+    $('detailsEmail').hidden = !TRAVEL_EMAIL;
     $('detailsSubmit').disabled = false;
     show('s-details');
   }
 
-  $('detailsForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var fields = [];
+  function detailsSummary() {
     var box = $('detailsFields');
     var inputs = box.querySelectorAll('input, select, textarea');
-    var missing = false;
-    for (var i = 0; i < inputs.length; i++) {
-      var el = inputs[i];
-      if (el.required && !el.value.trim()) { missing = true; }
-    }
-    if (missing) {
-      $('detailsErr').textContent = 'Please fill in all fields marked *.';
-      return;
-    }
-    $('detailsErr').textContent = '';
-
-    var mode = state.mode;
-    var label = MODE_LABEL[mode] || mode;
-    var lines = ['Traveller: ' + state.who, 'Mode: ' + label];
-    if (mode === 'car' && state.car) {
+    var lines = ['Traveller: ' + state.who, 'Mode: ' + (MODE_LABEL[state.mode] || state.mode)];
+    if (state.mode === 'car' && state.car) {
       lines.push('Vehicle: ' + state.car.name + (state.car.reg ? ' (' + state.car.reg + ')' : ''));
     }
     for (var j = 0; j < inputs.length; j++) {
@@ -710,17 +721,36 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
       var lab = box.querySelector('label[for="' + inp.id + '"]');
       lines.push((lab ? lab.textContent.replace(' *', '') : inp.name) + ': ' + v);
     }
-    fields = lines.join('\n');
+    return lines;
+  }
 
+  function detailsMissing() {
+    var inputs = $('detailsFields').querySelectorAll('input, select, textarea');
+    for (var i = 0; i < inputs.length; i++) {
+      if (inputs[i].required && !inputs[i].value.trim()) return true;
+    }
+    return false;
+  }
+
+  function modeTitle() { return MODE_LABEL[state.mode] || state.mode; }
+
+  $('detailsForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (detailsMissing()) {
+      $('detailsErr').textContent = 'Please fill in all fields marked *.';
+      return;
+    }
+    $('detailsErr').textContent = '';
     var btn = $('detailsSubmit');
     btn.disabled = true;
     btn.textContent = 'Sending...';
     fetch('https://ntfy.sh/' + TRAVEL_TOPIC, {
       method: 'POST',
-      headers: { 'Title': 'Travel request: ' + label, 'Tags': 'airplane' },
-      body: fields
+      headers: { 'Title': 'Travel request: ' + modeTitle(), 'Tags': 'airplane' },
+      body: detailsSummary().join('\n')
     }).then(function (res) {
       if (!res.ok) throw new Error('bad status');
+      btn.disabled = false;
       btn.textContent = 'Send request';
       show('s-done');
     }).catch(function () {
@@ -728,6 +758,17 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
       btn.textContent = 'Send request';
       $('detailsErr').textContent = 'Could not send. Check your connection and try again.';
     });
+  });
+
+  $('detailsEmail').addEventListener('click', function () {
+    if (detailsMissing()) {
+      $('detailsErr').textContent = 'Please fill in all fields marked *.';
+      return;
+    }
+    $('detailsErr').textContent = '';
+    window.location.href = 'mailto:' + TRAVEL_EMAIL +
+      '?subject=' + encodeURIComponent('Travel request: ' + modeTitle()) +
+      '&body=' + encodeURIComponent(detailsSummary().join('\n'));
   });
 
   $('again').addEventListener('click', function () {

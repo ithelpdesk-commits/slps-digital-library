@@ -635,6 +635,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 
   // Step 3c: details form, built from the field list
   function buildDetails(mode, title, fields) {
+    fields = [{ id: 'email', label: 'Your email', type: 'email', req: true }].concat(fields);
     state.mode = mode;
     $('detailsTitle').textContent = title;
     $('detailsErr').textContent = '';
@@ -727,7 +728,9 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
   function detailsMissing() {
     var inputs = $('detailsFields').querySelectorAll('input, select, textarea');
     for (var i = 0; i < inputs.length; i++) {
-      if (inputs[i].required && !inputs[i].value.trim()) return true;
+      var v = inputs[i].value.trim();
+      if (inputs[i].required && !v) return true;
+      if (inputs[i].id === 'f-email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return true;
     }
     return false;
   }
@@ -737,7 +740,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
   $('detailsForm').addEventListener('submit', function (e) {
     e.preventDefault();
     if (detailsMissing()) {
-      $('detailsErr').textContent = 'Please fill in all fields marked *.';
+      $('detailsErr').textContent = 'Please fill in all fields marked *. Use a valid email address.';
       return;
     }
     $('detailsErr').textContent = '';
@@ -762,7 +765,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 
   $('detailsEmail').addEventListener('click', function () {
     if (detailsMissing()) {
-      $('detailsErr').textContent = 'Please fill in all fields marked *.';
+      $('detailsErr').textContent = 'Please fill in all fields marked *. Use a valid email address.';
       return;
     }
     $('detailsErr').textContent = '';

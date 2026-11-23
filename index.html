@@ -7,29 +7,31 @@
 <style>
 /* Layout: one narrow column, one step on screen at a time, big tap targets for phones. */
 :root {
-  --bg: #F3F6F2;
+  /* Palette: #F8F5F2 cream, #CBD4C2 pale sage, #A7BFA8 sage, #6B9080 deep sage, #3F4E4F slate */
+  --bg: #F8F5F2;
   --card: #FFFFFF;
-  --fg: #14291E;
-  --muted: #5B6B62;
-  --accent: #0F6B4F;
-  --accent-ink: #FFFFFF;
-  --sun: #F2A900;
-  --line: #D5E0D9;
-  --chip: #E6F0EA;
+  --fg: #3F4E4F;
+  --muted: #586A69;
+  --accent: #3F4E4F;
+  --accent-ink: #F8F5F2;
+  --sage: #6B9080;
+  --sage-soft: #A7BFA8;
+  --line: #CBD4C2;
+  --chip: #E6EBE1;
   --err: #B42318;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0E1B15; --card: #16271F; --fg: #E7F2EC; --muted: #9DB5A8;
-    --accent: #3FBF93; --accent-ink: #0E1B15; --sun: #F2B93B; --line: #2A3F35;
-    --chip: #1F3A2E; --err: #FF8A80; color-scheme: dark;
+    --bg: #2C3839; --card: #3F4E4F; --fg: #F8F5F2; --muted: #CBD4C2;
+    --accent: #A7BFA8; --accent-ink: #2C3839; --sage: #A7BFA8; --sage-soft: #6B9080; --line: #5A6B6A;
+    --chip: #4B5C5B; --err: #FFB4AB; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0E1B15; --card: #16271F; --fg: #E7F2EC; --muted: #9DB5A8;
-  --accent: #3FBF93; --accent-ink: #0E1B15; --sun: #F2B93B; --line: #2A3F35;
-  --chip: #1F3A2E; --err: #FF8A80; color-scheme: dark;
+  --bg: #2C3839; --card: #3F4E4F; --fg: #F8F5F2; --muted: #CBD4C2;
+  --accent: #A7BFA8; --accent-ink: #2C3839; --sage: #A7BFA8; --sage-soft: #6B9080; --line: #5A6B6A;
+  --chip: #4B5C5B; --err: #FFB4AB; color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -76,7 +78,7 @@ input, select, textarea {
 }
 textarea { min-height: 96px; resize: vertical; }
 input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible {
-  outline: 3px solid var(--sun);
+  outline: 3px solid var(--sage);
   outline-offset: 2px;
 }
 
@@ -111,9 +113,9 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
   cursor: pointer;
   min-height: 72px;
 }
-.mode:hover, .mode:focus-visible { border-color: var(--accent); }
+.mode:hover, .mode:focus-visible { border-color: var(--sage); }
 .mode { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.mode svg { width: 40px; height: 40px; fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.mode svg { width: 40px; height: 40px; fill: none; stroke: var(--sage); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
 .list { display: grid; gap: 10px; margin-top: 14px; }
 .pick {
@@ -127,7 +129,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
   cursor: pointer;
   min-width: 0;
 }
-.pick:hover { border-color: var(--accent); }
+.pick:hover { border-color: var(--sage); }
 .pick .title { font-weight: 700; overflow-wrap: anywhere; }
 .pick .sub { font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
 .pick .price { font-weight: 700; color: var(--accent); white-space: nowrap; }
@@ -135,7 +137,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 .rec {
   display: grid; gap: 10px;
   padding: 14px; margin-top: 14px;
-  border: 1.5px solid var(--accent);
+  border: 1.5px solid var(--sage);
   border-radius: 14px;
   background: var(--chip);
   min-width: 0;
@@ -165,7 +167,14 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 <body>
 <main>
   <header class="brand">
-    <img class="logo" src="img/logo.svg" alt="Ravi Renewables Travel Desk" width="380" height="80">
+    <svg class="logo" viewBox="0 0 380 80" role="img" aria-label="Ravi Renewables Travel Desk">
+      <g transform="translate(40 40)" stroke="var(--sage-soft)" stroke-width="4" stroke-linecap="round">
+        <circle r="15" fill="var(--sage)" stroke="none"/>
+        <path d="M0-24V-32M0 24V32M-24 0H-32M24 0H32M17-17L23-23M-17-17L-23-23M17 17L23 23M-17 17L-23 23" fill="none"/>
+      </g>
+      <text x="86" y="40" font-family="Helvetica, Arial, sans-serif" font-size="26" font-weight="700" fill="var(--fg)">Ravi Renewables</text>
+      <text x="86" y="62" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="3" fill="var(--sage)">TRAVEL DESK</text>
+    </svg>
     <p class="kicker">Ravi Renewables Pvt Ltd</p>
     <h1>Travel Desk</h1>
     <p class="lede" id="lede">Start with your name or designation.</p>

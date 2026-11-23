@@ -132,7 +132,9 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 .pick:hover { border-color: var(--sage); }
 .pick .title { font-weight: 700; overflow-wrap: anywhere; }
 .pick .sub { font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
-.pick .price { font-weight: 700; color: var(--accent); white-space: nowrap; }
+.pick .title, .pick .sub { grid-column: 1; }
+.pick .price { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-weight: 700; color: var(--accent); white-space: nowrap; }
+.pick .price.soft { font-size: 12px; font-weight: 600; color: var(--muted); white-space: normal; max-width: 6em; text-align: right; }
 
 .rec {
   display: grid; gap: 10px;
@@ -499,6 +501,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
       var price = document.createElement('span');
       price.className = 'price';
       price.textContent = fareText(t);
+      if (!hasFare(t)) price.className = 'price soft';
       btn.appendChild(title);
       btn.appendChild(sub);
       btn.appendChild(price);
